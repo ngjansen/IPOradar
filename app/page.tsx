@@ -101,46 +101,146 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </header>
 
       {/* Hero */}
-      <section style={{ maxWidth: 1280, margin: "0 auto", padding: "48px 24px 32px" }}>
-        <div style={{ marginBottom: 8 }}>
-          <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", textTransform: "uppercase", letterSpacing: "0.15em" }}>
-            // live tracker
-          </span>
+      <section
+        className="hero-section"
+        style={{
+          maxWidth: 1280,
+          margin: "0 auto",
+          padding: "48px 24px 32px",
+          position: "relative",
+          overflow: "hidden",
+          backgroundImage: [
+            "radial-gradient(ellipse 90% 60% at 50% -10%, #00FF4109 0%, transparent 70%)",
+            "linear-gradient(#ffffff03 1px, transparent 1px)",
+            "linear-gradient(90deg, #ffffff03 1px, transparent 1px)",
+          ].join(", "),
+          backgroundSize: "100% 100%, 40px 40px, 40px 40px",
+        }}
+      >
+        {/* Ghost watermark */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            top: -20,
+            right: -20,
+            fontFamily: "var(--font-space-grotesk)",
+            fontWeight: 900,
+            fontSize: "clamp(160px, 30vw, 320px)",
+            color: "#00FF41",
+            opacity: 0.03,
+            pointerEvents: "none",
+            userSelect: "none",
+            lineHeight: 1,
+            zIndex: 0,
+          }}
+        >
+          IPO
         </div>
-        <h1 style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(28px, 5vw, 52px)", fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em", lineHeight: 1.1, margin: 0, marginBottom: 12 }}>
-          Upcoming IPO Calendar {new Date().getFullYear()}
-        </h1>
-        <p style={{ fontFamily: "var(--font-inter)", fontSize: 15, color: "#6A6A6A", maxWidth: 520, lineHeight: 1.6, margin: "0 0 24px 0" }}>
-          Confirmed IPOs with set dates, plus all recently filed S-1s. Updated every 4 hours.
-        </p>
 
-        {/* Source badges */}
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
-          <span style={{ fontFamily: "var(--font-inter)", fontSize: 11, color: "#3A3A3A", marginRight: 4 }}>Sources:</span>
+        {/* Content above background layers */}
+        <div style={{ position: "relative", zIndex: 1 }}>
+          {/* Live tracker label */}
+          <div style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#00FF41", boxShadow: "0 0 6px #00FF41", animation: "blink 2s ease-in-out infinite", flexShrink: 0 }} />
+            <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", textTransform: "uppercase", letterSpacing: "0.15em" }}>
+              // live tracker
+            </span>
+            <span style={{ background: "#00FF4115", border: "1px solid #00FF4140", color: "#00FF41", fontSize: 9, fontFamily: "var(--font-jetbrains-mono)", padding: "2px 7px", borderRadius: 4, letterSpacing: "0.1em" }}>
+              LIVE
+            </span>
+          </div>
 
-          <a href="https://www.nasdaq.com/market-activity/ipos" target="_blank" rel="noopener noreferrer" className="source-badge">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect width="12" height="12" rx="2" fill="#0067B1"/><path d="M2 9V3h1.5l2.5 4V3H7.5v6H6L3.5 5v4H2zm5.5 0V3H9v6H7.5z" fill="white" fillOpacity="0.9"/></svg>
-            <span className="source-name">Nasdaq EDGAR</span>
-            <span className="source-desc">IPO filings</span>
-          </a>
+          {/* H1 */}
+          <h1 style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(36px, 6vw, 68px)", fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em", lineHeight: 1.1, margin: 0, marginBottom: 12, textShadow: "0 0 60px #00FF4118, 0 0 120px #00FF410A" }}>
+            Upcoming IPO Calendar {new Date().getFullYear()}
+            <span style={{ color: "#00FF41", animation: "blink 1.2s step-end infinite" }}>_</span>
+          </h1>
 
-          <a href="https://finnhub.io" target="_blank" rel="noopener noreferrer" className="source-badge">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect width="12" height="12" rx="2" fill="#1DB954"/><path d="M3 8.5l2-5 2 3.5 1-2 1 3.5" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-            <span className="source-name">Finnhub</span>
-            <span className="source-desc">confirmed calendar</span>
-          </a>
+          <p style={{ fontFamily: "var(--font-inter)", fontSize: 15, color: "#6A6A6A", maxWidth: 520, lineHeight: 1.6, margin: "0 0 0 0" }}>
+            Confirmed IPOs with set dates, plus all recently filed S-1s. Updated every 4 hours.
+          </p>
 
-          <a href="https://news.google.com" target="_blank" rel="noopener noreferrer" className="source-badge">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect width="12" height="12" rx="2" fill="#222"/><path d="M2 4h8M2 6h5M2 8h6" stroke="#9A9A9A" strokeWidth="1.2" strokeLinecap="round"/></svg>
-            <span className="source-name">Google News</span>
-            <span className="source-desc">live news feed</span>
-          </a>
+          {/* Stats bar */}
+          {(() => {
+            const nextIPORaw = [...upcoming].sort((a, b) => a.date.localeCompare(b.date))[0]?.date;
+            const nextIPOLabel = nextIPORaw
+              ? new Date(nextIPORaw + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })
+              : "TBD";
+            const stats: { value: string | number; label: string; highlight?: boolean }[] = [
+              { value: upcoming.length, label: "IPOs this cycle", highlight: true },
+              { value: filed.length, label: "S-1 filed" },
+              { value: techCount, label: "tech companies" },
+              { value: nextIPOLabel, label: "next listing" },
+            ];
+            return (
+              <div style={{ display: "flex", gap: 0, borderTop: "1px solid #1A1A1A", borderBottom: "1px solid #1A1A1A", margin: "28px 0 24px", padding: "20px 0" }}>
+                {stats.map((stat, i) => (
+                  <div key={i} style={{ flex: 1, paddingLeft: i > 0 ? 24 : 0, paddingRight: 24, borderLeft: i > 0 ? "1px solid #1A1A1A" : "none" }}>
+                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 600, color: stat.highlight ? "#00FF41" : "#F0F0F0", lineHeight: 1 }}>
+                      {stat.value}
+                    </div>
+                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#3A3A3A", textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 4 }}>
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
 
-          <span className="source-badge source-badge--static">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect width="12" height="12" rx="2" fill="#1A1A1A"/><circle cx="6" cy="6" r="2" stroke="#00FF41" strokeWidth="1" fill="none"/><path d="M6 2v1M6 9v1M2 6h1M9 6h1" stroke="#3A3A3A" strokeWidth="1" strokeLinecap="round"/></svg>
-            <span className="source-name" style={{ color: "#3A3A3A" }}>SEC EDGAR</span>
-            <span className="source-desc">via Nasdaq</span>
-          </span>
+          {/* Source badges */}
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
+            <span style={{ fontFamily: "var(--font-inter)", fontSize: 11, color: "#3A3A3A", marginRight: 4 }}>Sources:</span>
+
+            <a href="https://www.nasdaq.com/market-activity/ipos" target="_blank" rel="noopener noreferrer" className="source-badge">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect width="12" height="12" rx="2" fill="#0067B1"/><path d="M2 9V3h1.5l2.5 4V3H7.5v6H6L3.5 5v4H2zm5.5 0V3H9v6H7.5z" fill="white" fillOpacity="0.9"/></svg>
+              <span className="source-name">Nasdaq EDGAR</span>
+              <span className="source-desc">IPO filings</span>
+            </a>
+
+            <a href="https://finnhub.io" target="_blank" rel="noopener noreferrer" className="source-badge">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect width="12" height="12" rx="2" fill="#1DB954"/><path d="M3 8.5l2-5 2 3.5 1-2 1 3.5" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+              <span className="source-name">Finnhub</span>
+              <span className="source-desc">confirmed calendar</span>
+            </a>
+
+            <a href="https://news.google.com" target="_blank" rel="noopener noreferrer" className="source-badge">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect width="12" height="12" rx="2" fill="#222"/><path d="M2 4h8M2 6h5M2 8h6" stroke="#9A9A9A" strokeWidth="1.2" strokeLinecap="round"/></svg>
+              <span className="source-name">Google News</span>
+              <span className="source-desc">live news feed</span>
+            </a>
+
+            <span className="source-badge source-badge--static">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect width="12" height="12" rx="2" fill="#1A1A1A"/><circle cx="6" cy="6" r="2" stroke="#00FF41" strokeWidth="1" fill="none"/><path d="M6 2v1M6 9v1M2 6h1M9 6h1" stroke="#3A3A3A" strokeWidth="1" strokeLinecap="round"/></svg>
+              <span className="source-name" style={{ color: "#3A3A3A" }}>SEC EDGAR</span>
+              <span className="source-desc">via Nasdaq</span>
+            </span>
+          </div>
+
+          {/* Scrolling ticker */}
+          {upcoming.length > 0 && (
+            <div style={{ overflow: "hidden", position: "relative", marginTop: 32 }}>
+              <div style={{ WebkitMaskImage: "linear-gradient(to right, transparent, black 80px, black calc(100% - 80px), transparent)", maskImage: "linear-gradient(to right, transparent, black 80px, black calc(100% - 80px), transparent)" }}>
+                <div className="ticker-track">
+                  {[...upcoming.slice(0, 20), ...upcoming.slice(0, 20)].map((ipo, i) => (
+                    <span key={i} style={{ display: "inline-flex", alignItems: "center", marginRight: 8 }}>
+                      <span style={{ color: "#00FF41", fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, fontWeight: 600 }}>${ipo.symbol}</span>
+                      <span style={{ color: "#2A2A2A", margin: "0 8px" }}>·</span>
+                      <span style={{ color: "#4A4A4A", fontFamily: "var(--font-jetbrains-mono)", fontSize: 11 }}>{ipo.date || "TBD"}</span>
+                      {ipo.priceRange && ipo.priceRange !== "TBD" && (
+                        <>
+                          <span style={{ color: "#2A2A2A", margin: "0 8px" }}>·</span>
+                          <span style={{ color: "#4A4A4A", fontFamily: "var(--font-jetbrains-mono)", fontSize: 11 }}>{ipo.priceRange}</span>
+                        </>
+                      )}
+                      <span style={{ color: "#2A2A2A", margin: "0 16px" }}>·</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -176,6 +276,22 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
       <style>{`
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .ticker-track {
+          display: inline-flex;
+          align-items: center;
+          white-space: nowrap;
+          animation: ticker 40s linear infinite;
+        }
+        .hero-section::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+          opacity: 0.025;
+          pointer-events: none;
+          z-index: 0;
+        }
         .recent-nav-link {
           font-family: var(--font-inter);
           font-size: 12px;
