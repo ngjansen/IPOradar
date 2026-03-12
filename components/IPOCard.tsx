@@ -55,7 +55,8 @@ export function IPOCard({ ipo }: IPOCardProps) {
         textDecoration: "none",
         transition: "transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease",
         opacity: isCompact ? 0.75 : 1,
-        ...(!isCompact && ipo.isTech ? { borderLeft: "2px solid #00FF41", boxShadow: "-4px 0 16px #00FF4115" } : {}),
+        ...(!isCompact && isImminent ? { borderTop: "2px solid #00FF41" } : {}),
+        ...(!isCompact && !isImminent && ipo.isTech ? { borderLeft: "2px solid #00FF41", boxShadow: "-4px 0 16px #00FF4115" } : {}),
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget as HTMLElement;
@@ -95,6 +96,22 @@ export function IPOCard({ ipo }: IPOCardProps) {
         <span style={{ fontFamily: "var(--font-inter)", fontSize: 10, fontWeight: 500, color: isCompact ? "#3A3A3A" : ipo.isTech ? "#00FF41" : "#6A6A6A", background: isCompact ? "#1A1A1A" : ipo.isTech ? "#00FF4110" : "#1A1A1A", border: `1px solid ${isCompact ? "#222" : ipo.isTech ? "#00FF4130" : "#2a2a2a"}`, borderRadius: 6, padding: "3px 8px", whiteSpace: "nowrap", flexShrink: 0 }}>
           {ipo.sector}
         </span>
+        {isImminent && (
+          <span style={{
+            fontFamily: "var(--font-jetbrains-mono)",
+            fontSize: 10,
+            fontWeight: 700,
+            color: "#00FF41",
+            background: "#00FF4115",
+            border: "1px solid #00FF4140",
+            borderRadius: 6,
+            padding: "3px 8px",
+            whiteSpace: "nowrap",
+            flexShrink: 0,
+          }}>
+            {days === 0 ? "TODAY" : days === 1 ? "TOMORROW" : `in ${days}d`}
+          </span>
+        )}
       </div>
 
       {/* Filed card: compact view */}
@@ -150,7 +167,7 @@ export function IPOCard({ ipo }: IPOCardProps) {
       ) : (
         /* Upcoming card: full view */
         <>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: ipo.offerAmount ? "1fr 1fr 1fr" : "1fr 1fr", gap: 12, marginBottom: 14 }}>
             <div>
               <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 3 }}>
                 Expected Date
@@ -167,6 +184,16 @@ export function IPOCard({ ipo }: IPOCardProps) {
                 {ipo.priceRange}
               </div>
             </div>
+            {ipo.offerAmount && (
+              <div>
+                <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 3 }}>
+                  Offer Size
+                </div>
+                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: "#F0F0F0" }}>
+                  {ipo.offerAmount}
+                </div>
+              </div>
+            )}
           </div>
 
           <div style={{ marginBottom: 10 }}>
@@ -177,11 +204,6 @@ export function IPOCard({ ipo }: IPOCardProps) {
             <HypeBar score={ipo.hypeScore} />
           </div>
 
-          {days >= 0 && (
-            <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: isImminent ? "#00FF41" : "#3A3A3A", textAlign: "right" }}>
-              {days === 0 ? "Today" : `in ${days} day${days === 1 ? "" : "s"}`}
-            </div>
-          )}
         </>
       )}
     </Link>

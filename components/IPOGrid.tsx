@@ -40,6 +40,13 @@ function SectionHeading({ label, count, dim }: { label: string; count: number; d
   );
 }
 
+function daysUntil(dateStr: string): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(dateStr + "T00:00:00");
+  return Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+}
+
 export function IPOGrid({ upcoming, filed, activeSector }: IPOGridProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const handleSearch = useCallback((q: string) => setSearchQuery(q), []);
@@ -61,6 +68,9 @@ export function IPOGrid({ upcoming, filed, activeSector }: IPOGridProps) {
   const filteredFiled = filter(filed);
   const total = filteredUpcoming.length + filteredFiled.length;
 
+  const imminent = filteredUpcoming.filter(ipo => ipo.date && daysUntil(ipo.date) >= 0 && daysUntil(ipo.date) <= 7).sort((a, b) => a.date!.localeCompare(b.date!));
+  const later = filteredUpcoming.filter(ipo => !ipo.date || daysUntil(ipo.date) < 0 || daysUntil(ipo.date) > 7);
+
   return (
     <div>
       <div style={{ marginBottom: 24 }}>
@@ -77,9 +87,25 @@ export function IPOGrid({ upcoming, filed, activeSector }: IPOGridProps) {
           {filteredUpcoming.length > 0 && (
             <div style={{ marginBottom: 48 }}>
               <SectionHeading label="Confirmed — Date Set" count={filteredUpcoming.length} />
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
-                {filteredUpcoming.map(ipo => <IPOCard key={ipo.symbol} ipo={ipo} />)}
-              </div>
+              {imminent.length > 0 ? (
+                <>
+                  <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 12 }}>
+                    // this week
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16, marginBottom: later.length > 0 ? 24 : 0 }}>
+                    {imminent.map(ipo => <IPOCard key={ipo.symbol} ipo={ipo} />)}
+                  </div>
+                  {later.length > 0 && (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
+                      {later.map(ipo => <IPOCard key={ipo.symbol} ipo={ipo} />)}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
+                  {filteredUpcoming.map(ipo => <IPOCard key={ipo.symbol} ipo={ipo} />)}
+                </div>
+              )}
             </div>
           )}
 
