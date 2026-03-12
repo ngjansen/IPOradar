@@ -1,0 +1,515 @@
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import type { Metadata } from "next";
+import type { IPODetail } from "@/lib/types";
+import { LetterAvatar } from "@/components/LetterAvatar";
+import { NewsFeed } from "@/components/NewsFeed";
+import { fetchUpcomingIPOs, fetchCompanyProfile } from "@/lib/finnhub";
+import { fetchNasdaqIPOs, fetchRecentIPOs } from "@/lib/nasdaq";
+import { fetchIPODetail } from "@/lib/fmp";
+
+export const revalidate = 14400;
+
+async function getIPODetail(symbol: string): Promise<IPODetail | null> {
+  try {
+    const upper = symbol.toUpperCase();
+
+    const [finnhubIPOs, nasdaq, recent] = await Promise.all([
+      fetchUpcomingIPOs().catch(() => []),
+      fetchNasdaqIPOs().catch(() => ({ upcoming: [], filed: [] })),
+      fetchRecentIPOs().catch(() => []),
+    ]);
+    const baseIPO = finnhubIPOs.find((ipo) => ipo.symbol.toUpperCase() === upper)
+      ?? nasdaq.upcoming.find((ipo) => ipo.symbol.toUpperCase() === upper)
+      ?? nasdaq.filed.find((ipo) => ipo.symbol.toUpperCase() === upper)
+      ?? recent.find((ipo) => ipo.symbol.toUpperCase() === upper);
+
+    if (!baseIPO) return null;
+
+    const [fmpData, finnhubData] = await Promise.all([
+      fetchIPODetail(symbol).catch((): Partial<IPODetail> => ({})),
+      fetchCompanyProfile(symbol).catch(() => null),
+    ]);
+
+    return {
+      ...baseIPO,
+      description:
+        fmpData.description ||
+        `${baseIPO.company} is an upcoming initial public offering on ${baseIPO.exchange || "a major exchange"}.`,
+      website: fmpData.website || finnhubData?.weburl || "",
+      employees: fmpData.employees || finnhubData?.employeeTotal || null,
+      revenue: fmpData.revenue || null,
+      underwriter: fmpData.underwriter || "",
+      country: fmpData.country || finnhubData?.country || "US",
+      ceo: fmpData.ceo || "",
+      sector: fmpData.sector || finnhubData?.finnhubIndustry || baseIPO.sector,
+      industry: fmpData.industry || finnhubData?.finnhubIndustry || baseIPO.industry,
+      exchange: fmpData.exchange || baseIPO.exchange,
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function getAllIPOSymbols(): Promise<string[]> {
+  try {
+    const [finnhubIPOs, nasdaq, recent] = await Promise.allSettled([
+      fetchUpcomingIPOs(),
+      fetchNasdaqIPOs(),
+      fetchRecentIPOs(),
+    ]);
+
+    const symbols: string[] = [];
+    if (finnhubIPOs.status === "fulfilled") symbols.push(...finnhubIPOs.value.map(i => i.symbol));
+    if (nasdaq.status === "fulfilled") {
+      symbols.push(...nasdaq.value.upcoming.map(i => i.symbol));
+      symbols.push(...nasdaq.value.filed.map(i => i.symbol));
+    }
+    if (recent.status === "fulfilled") symbols.push(...recent.value.map(i => i.symbol));
+
+    return [...new Set(symbols)].filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+export async function generateStaticParams() {
+  const symbols = await getAllIPOSymbols();
+  return symbols.map((symbol) => ({ symbol }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ symbol: string }>;
+}): Promise<Metadata> {
+  const { symbol } = await params;
+  const ipo = await getIPODetail(symbol);
+
+  if (!ipo) {
+    return { title: `${symbol} IPO — IPOradar` };
+  }
+
+  if (ipo.status === "filed") {
+    return {
+      title: `${ipo.company} IPO — Filed S-1, Date TBD`,
+      description: `${ipo.company} (${ipo.symbol}) has filed an S-1 with the SEC. IPO date is pending. ${ipo.description?.slice(0, 100) || ""}`,
+    };
+  }
+  if (ipo.status === "priced") {
+    return {
+      title: `${ipo.company} IPO — Priced at ${ipo.priceRange}`,
+      description: `${ipo.company} (${ipo.symbol}) priced its IPO on ${ipo.pricedDate} at ${ipo.priceRange}. ${ipo.description?.slice(0, 100) || ""}`,
+    };
+  }
+  return {
+    title: `${ipo.company} IPO — ${ipo.date}, ${ipo.priceRange} & Latest News`,
+    description: `${ipo.company} (${ipo.symbol}) IPO on ${ipo.exchange}. Expected date: ${ipo.date}. Price range: ${ipo.priceRange}. ${ipo.description?.slice(0, 100) || ""}`,
+  };
+}
+
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr + "T00:00:00");
+  return date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+}
+
+function formatRevenue(revenue: number): string {
+  if (revenue >= 1e9) return `$${(revenue / 1e9).toFixed(1)}B`;
+  if (revenue >= 1e6) return `$${(revenue / 1e6).toFixed(0)}M`;
+  return `$${revenue.toLocaleString()}`;
+}
+
+export default async function IPODetailPage({
+  params,
+}: {
+  params: Promise<{ symbol: string }>;
+}) {
+  const { symbol } = await params;
+  const ipo = await getIPODetail(symbol);
+
+  if (!ipo) {
+    notFound();
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#0D0D0D" }}>
+      {/* Nav */}
+      <nav
+        style={{
+          borderBottom: "1px solid #1A1A1A",
+          padding: "0 24px",
+          height: 56,
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          position: "sticky",
+          top: 0,
+          zIndex: 50,
+          background: "#0D0D0D",
+        }}
+      >
+        <Link
+          href="/"
+          style={{
+            fontFamily: "var(--font-space-grotesk)",
+            fontSize: 18,
+            fontWeight: 700,
+            color: "#F0F0F0",
+            letterSpacing: "-0.04em",
+            textDecoration: "none",
+          }}
+        >
+          IPO<span style={{ color: "#00FF41" }}>radar</span>
+        </Link>
+        <span style={{ color: "#2A2A2A" }}>›</span>
+        <span
+          style={{
+            fontFamily: "var(--font-jetbrains-mono)",
+            fontSize: 13,
+            color: "#6A6A6A",
+          }}
+        >
+          {ipo.symbol}
+        </span>
+      </nav>
+
+      <div
+        style={{
+          maxWidth: 1280,
+          margin: "0 auto",
+          padding: "40px 24px 80px",
+        }}
+      >
+        {/* Hero */}
+        <div
+          style={{
+            background: "#141414",
+            border: `1px solid ${ipo.isTech ? "#00FF4130" : "#222"}`,
+            borderRadius: 16,
+            padding: "32px",
+            marginBottom: 32,
+            ...(ipo.isTech ? {
+              borderLeft: "3px solid #00FF41",
+              boxShadow: "-4px 0 20px #00FF4115",
+            } : {}),
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 20, flexWrap: "wrap" }}>
+            <LetterAvatar name={ipo.company} size="lg" />
+
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <div style={{ marginBottom: 6 }}>
+                <span
+                  style={{
+                    fontFamily: "var(--font-jetbrains-mono)",
+                    fontSize: 11,
+                    color: "#00FF41",
+                    background: "#00FF4110",
+                    border: "1px solid #00FF4130",
+                    borderRadius: 4,
+                    padding: "2px 8px",
+                    marginBottom: 8,
+                    display: "inline-block",
+                  }}
+                >
+                  ${ipo.symbol}
+                </span>
+              </div>
+              <h1
+                style={{
+                  fontFamily: "var(--font-space-grotesk)",
+                  fontSize: "clamp(22px, 4vw, 36px)",
+                  fontWeight: 700,
+                  color: "#F0F0F0",
+                  margin: "0 0 8px 0",
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1.1,
+                }}
+              >
+                {ipo.company}
+              </h1>
+              <div
+                style={{
+                  fontFamily: "var(--font-inter)",
+                  fontSize: 13,
+                  color: "#6A6A6A",
+                }}
+              >
+                {ipo.sector} · {ipo.exchange}
+                {ipo.ceo && ` · CEO: ${ipo.ceo}`}
+              </div>
+            </div>
+
+            {/* Key stats — conditional on status */}
+            <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+              {ipo.status === "filed" ? (
+                <>
+                  <div>
+                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
+                      Status
+                    </div>
+                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 13, color: "#6A6A6A", fontWeight: 500 }}>
+                      Filed S-1 — Date TBD
+                    </div>
+                  </div>
+                  {ipo.filedDate && (
+                    <div>
+                      <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
+                        Filed Date
+                      </div>
+                      <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: "#9A9A9A", fontWeight: 500 }}>
+                        {formatDate(ipo.filedDate)}
+                      </div>
+                    </div>
+                  )}
+                  {ipo.offerAmount && (
+                    <div>
+                      <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
+                        Offer Size
+                      </div>
+                      <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: "#9A9A9A", fontWeight: 500 }}>
+                        {ipo.offerAmount}
+                      </div>
+                    </div>
+                  )}
+                  <div>
+                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
+                      SEC Filing
+                    </div>
+                    <a
+                      href={`https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(ipo.symbol)}%22&dateRange=custom&startdt=2025-01-01&forms=S-1`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 13, color: "#00FF41", textDecoration: "none" }}
+                    >
+                      View S-1 on EDGAR ↗
+                    </a>
+                  </div>
+                </>
+              ) : ipo.status === "priced" ? (
+                <>
+                  <div>
+                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
+                      Status
+                    </div>
+                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 13, color: "#6A6A6A", fontWeight: 500 }}>
+                      Priced ✓
+                    </div>
+                  </div>
+                  {ipo.pricedDate && (
+                    <div>
+                      <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
+                        Priced Date
+                      </div>
+                      <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: "#9A9A9A", fontWeight: 500 }}>
+                        {formatDate(ipo.pricedDate)}
+                      </div>
+                    </div>
+                  )}
+                  <div>
+                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
+                      Priced At
+                    </div>
+                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: "#9A9A9A", fontWeight: 600 }}>
+                      {ipo.priceRange}
+                    </div>
+                  </div>
+                  {ipo.offerAmount && (
+                    <div>
+                      <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
+                        Offer Size
+                      </div>
+                      <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: "#9A9A9A", fontWeight: 500 }}>
+                        {ipo.offerAmount}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div>
+                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
+                      Expected Date
+                    </div>
+                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: "#F0F0F0", fontWeight: 500 }}>
+                      {formatDate(ipo.date)}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
+                      Price Range
+                    </div>
+                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: "#00FF41", fontWeight: 600 }}>
+                      {ipo.priceRange}
+                    </div>
+                  </div>
+                  {ipo.hypeScore > 0 && (
+                    <div>
+                      <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
+                        Hype Score
+                      </div>
+                      <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: "#00FF41", fontWeight: 600 }}>
+                        {ipo.hypeScore.toFixed(1)}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Two-column layout */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "minmax(0, 1fr) minmax(0, 380px)",
+            gap: 24,
+            alignItems: "start",
+          }}
+        >
+          {/* Left: description + stats */}
+          <div>
+            {/* Business description */}
+            {ipo.description && (
+              <div
+                style={{
+                  background: "#141414",
+                  border: "1px solid #222",
+                  borderRadius: 12,
+                  padding: "24px",
+                  marginBottom: 20,
+                }}
+              >
+                <h2
+                  style={{
+                    fontFamily: "var(--font-space-grotesk)",
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: "#F0F0F0",
+                    margin: "0 0 12px 0",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
+                  }}
+                >
+                  About
+                </h2>
+                <p
+                  style={{
+                    fontFamily: "var(--font-inter)",
+                    fontSize: 14,
+                    color: "#9A9A9A",
+                    lineHeight: 1.7,
+                    margin: 0,
+                  }}
+                >
+                  {ipo.description}
+                </p>
+              </div>
+            )}
+
+            {/* Key stats */}
+            <div
+              style={{
+                background: "#141414",
+                border: "1px solid #222",
+                borderRadius: 12,
+                padding: "24px",
+              }}
+            >
+              <h2
+                style={{
+                  fontFamily: "var(--font-space-grotesk)",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: "#F0F0F0",
+                  margin: "0 0 16px 0",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                }}
+              >
+                Key Data
+              </h2>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+                  gap: 16,
+                }}
+              >
+                {[
+                  { label: "Exchange", value: ipo.exchange },
+                  { label: "Sector", value: ipo.sector },
+                  { label: "Industry", value: ipo.industry },
+                  { label: "Country", value: ipo.country || "US" },
+                  ipo.employees ? { label: "Employees", value: ipo.employees.toLocaleString() } : null,
+                  ipo.revenue ? { label: "Revenue", value: formatRevenue(ipo.revenue) } : null,
+                  ipo.sharesOffered ? { label: "Shares Offered", value: (ipo.sharesOffered / 1e6).toFixed(1) + "M" } : null,
+                  ipo.underwriter ? { label: "Underwriter", value: ipo.underwriter } : null,
+                  ipo.website ? { label: "Website", value: ipo.website, isLink: true } : null,
+                ]
+                  .filter(Boolean)
+                  .map((stat, i) => (
+                    <div key={i}>
+                      <div
+                        style={{
+                          fontFamily: "var(--font-inter)",
+                          fontSize: 10,
+                          color: "#4A4A4A",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.08em",
+                          marginBottom: 4,
+                        }}
+                      >
+                        {stat!.label}
+                      </div>
+                      {stat!.isLink ? (
+                        <a
+                          href={stat!.value}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            fontFamily: "var(--font-jetbrains-mono)",
+                            fontSize: 12,
+                            color: "#00FF41",
+                            textDecoration: "none",
+                          }}
+                        >
+                          {stat!.value.replace(/^https?:\/\//, "")}
+                        </a>
+                      ) : (
+                        <div
+                          style={{
+                            fontFamily: "var(--font-jetbrains-mono)",
+                            fontSize: 12,
+                            color: "#E0E0E0",
+                          }}
+                        >
+                          {stat!.value}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right: news feed */}
+          <div
+            style={{
+              background: "#141414",
+              border: "1px solid #222",
+              borderRadius: 12,
+              padding: "24px",
+              position: "sticky",
+              top: 72,
+            }}
+          >
+            <NewsFeed company={ipo.company} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
