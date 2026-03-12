@@ -3,6 +3,14 @@
 import Link from "next/link";
 import type { IPO } from "@/lib/types";
 import { LetterAvatar } from "./LetterAvatar";
+import { Tooltip } from "./Tooltip";
+
+const GLOSSARY: Record<string, string> = {
+  "Expected Date": "The scheduled first day of public trading for this IPO.",
+  "Price Range": "The per-share price range set by underwriters before the IPO. Final price is set the night before trading begins.",
+  "Offer Size": "Total capital the company aims to raise — shares offered multiplied by the price range midpoint.",
+  "Hype Score": "IPOradar signal based on recent news volume. Higher score = more media attention in the past 7 days.",
+};
 
 interface IPOCardProps {
   ipo: IPO;
@@ -169,26 +177,32 @@ export function IPOCard({ ipo }: IPOCardProps) {
         <>
           <div style={{ display: "grid", gridTemplateColumns: ipo.offerAmount ? "1fr 1fr 1fr" : "1fr 1fr", gap: 12, marginBottom: 14 }}>
             <div>
-              <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 3 }}>
-                Expected Date
-              </div>
+              <Tooltip definition={GLOSSARY["Expected Date"]}>
+                <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 3 }}>
+                  Expected Date
+                </div>
+              </Tooltip>
               <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: isImminent ? "#00FF41" : "#9A9A9A", fontWeight: isImminent ? 600 : 400 }}>
                 {ipo.date ? formatDate(ipo.date) : "TBD"}
               </div>
             </div>
             <div>
-              <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 3 }}>
-                Price Range
-              </div>
+              <Tooltip definition={GLOSSARY["Price Range"]}>
+                <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 3 }}>
+                  Price Range
+                </div>
+              </Tooltip>
               <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: "#F0F0F0" }}>
                 {ipo.priceRange}
               </div>
             </div>
             {ipo.offerAmount && (
               <div>
-                <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 3 }}>
-                  Offer Size
-                </div>
+                <Tooltip definition={GLOSSARY["Offer Size"]}>
+                  <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 3 }}>
+                    Offer Size
+                  </div>
+                </Tooltip>
                 <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: "#F0F0F0" }}>
                   {ipo.offerAmount}
                 </div>
@@ -198,7 +212,7 @@ export function IPOCard({ ipo }: IPOCardProps) {
 
           <div style={{ marginBottom: 10 }}>
             <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 5, display: "flex", justifyContent: "space-between" }}>
-              <span>Hype Score</span>
+              <Tooltip definition={GLOSSARY["Hype Score"]}><span>Hype Score</span></Tooltip>
               {ipo.newsCount > 0 && <span style={{ color: "#4A4A4A" }}>{ipo.newsCount} articles</span>}
             </div>
             <HypeBar score={ipo.hypeScore} />

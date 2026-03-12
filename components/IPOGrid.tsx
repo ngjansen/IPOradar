@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import type { IPO } from "@/lib/types";
 import { IPOCard } from "./IPOCard";
 import { SearchBar } from "./SearchBar";
+import { Tooltip } from "./Tooltip";
 
 interface IPOGridProps {
   upcoming: IPO[];
@@ -11,22 +12,24 @@ interface IPOGridProps {
   activeSector: string;
 }
 
-function SectionHeading({ label, count, dim }: { label: string; count: number; dim?: boolean }) {
+function SectionHeading({ label, count, dim, tooltip }: { label: string; count: number; dim?: boolean; tooltip?: string }) {
   return (
     <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 16 }}>
-      <h2
-        style={{
-          fontFamily: "var(--font-space-grotesk)",
-          fontSize: 13,
-          fontWeight: 700,
-          color: dim ? "#4A4A4A" : "#F0F0F0",
-          textTransform: "uppercase",
-          letterSpacing: "0.1em",
-          margin: 0,
-        }}
-      >
-        {label}
-      </h2>
+      <Tooltip definition={tooltip ?? ""}>
+        <h2
+          style={{
+            fontFamily: "var(--font-space-grotesk)",
+            fontSize: 13,
+            fontWeight: 700,
+            color: dim ? "#4A4A4A" : "#F0F0F0",
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+            margin: 0,
+          }}
+        >
+          {label}
+        </h2>
+      </Tooltip>
       <span
         style={{
           fontFamily: "var(--font-jetbrains-mono)",
@@ -86,7 +89,7 @@ export function IPOGrid({ upcoming, filed, activeSector }: IPOGridProps) {
           {/* Confirmed upcoming */}
           {filteredUpcoming.length > 0 && (
             <div style={{ marginBottom: 48 }}>
-              <SectionHeading label="Confirmed — Date Set" count={filteredUpcoming.length} />
+              <SectionHeading label="Confirmed — Date Set" count={filteredUpcoming.length} tooltip="These companies have set an official IPO date. Shares will begin trading on the expected date." />
               {imminent.length > 0 ? (
                 <>
                   <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 12 }}>
@@ -113,7 +116,7 @@ export function IPOGrid({ upcoming, filed, activeSector }: IPOGridProps) {
           {filteredFiled.length > 0 && (
             <div>
               <div style={{ marginBottom: 16 }}>
-                <SectionHeading label="Filed S-1 — Date TBD" count={filteredFiled.length} dim />
+                <SectionHeading label="Filed S-1 — Date TBD" count={filteredFiled.length} dim tooltip="An S-1 is a registration statement filed with the SEC to go public. These companies have filed but haven't set a trading date yet." />
                 <p style={{ fontFamily: "var(--font-inter)", fontSize: 12, color: "#3A3A3A", margin: 0 }}>
                   These companies have filed registration statements with the SEC but have not yet set an IPO date.
                 </p>
