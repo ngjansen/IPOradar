@@ -84,14 +84,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             </span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
-              <span style={{ color: "#F0F0F0", fontWeight: 600 }}>{upcoming.length}</span> confirmed
-            </div>
-            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
-              <span style={{ color: "#6A6A6A", fontWeight: 600 }}>{filed.length}</span> filed
-            </div>
-            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
-              <span style={{ color: "#00FF41", fontWeight: 600 }}>{techCount}</span> tech
+            <div className="header-stats" style={{ display: "flex", alignItems: "center", gap: 20 }}>
+              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
+                <span style={{ color: "#F0F0F0", fontWeight: 600 }}>{upcoming.length}</span> confirmed
+              </div>
+              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
+                <span style={{ color: "#6A6A6A", fontWeight: 600 }}>{filed.length}</span> filed
+              </div>
+              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
+                <span style={{ color: "#00FF41", fontWeight: 600 }}>{techCount}</span> tech
+              </div>
             </div>
             <Link href="/recent" className="recent-nav-link">
               Recent IPOs
@@ -106,7 +108,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         style={{
           maxWidth: 1280,
           margin: "0 auto",
-          padding: "48px 24px 32px",
+          padding: "28px 24px 20px",
           position: "relative",
           overflow: "hidden",
           backgroundImage: [
@@ -152,7 +154,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           </div>
 
           {/* H1 */}
-          <h1 style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(36px, 6vw, 68px)", fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em", lineHeight: 1.1, margin: 0, marginBottom: 12, textShadow: "0 0 60px #00FF4118, 0 0 120px #00FF410A" }}>
+          <h1 style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(28px, 5vw, 60px)", fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em", lineHeight: 1.1, margin: 0, marginBottom: 8, textShadow: "0 0 60px #00FF4118, 0 0 120px #00FF410A" }}>
             Upcoming IPO Calendar {new Date().getFullYear()}
             <span style={{ color: "#00FF41", animation: "blink 1.2s step-end infinite" }}>_</span>
           </h1>
@@ -174,10 +176,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               { value: nextIPOLabel, label: "next listing" },
             ];
             return (
-              <div style={{ display: "flex", gap: 0, borderTop: "1px solid #1A1A1A", borderBottom: "1px solid #1A1A1A", margin: "28px 0 24px", padding: "20px 0" }}>
+              <div className="stats-bar" style={{ display: "flex", gap: 0, borderTop: "1px solid #1A1A1A", borderBottom: "1px solid #1A1A1A", margin: "16px 0 16px", padding: "14px 0" }}>
                 {stats.map((stat, i) => (
-                  <div key={i} style={{ flex: 1, paddingLeft: i > 0 ? 24 : 0, paddingRight: 24, borderLeft: i > 0 ? "1px solid #1A1A1A" : "none" }}>
-                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 600, color: stat.highlight ? "#00FF41" : "#F0F0F0", lineHeight: 1 }}>
+                  <div key={i} className="stat-cell" style={{ flex: 1, paddingLeft: i > 0 ? 20 : 0, paddingRight: 20, borderLeft: i > 0 ? "1px solid #1A1A1A" : "none" }}>
+                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: "clamp(18px, 2.5vw, 28px)", fontWeight: 600, color: stat.highlight ? "#00FF41" : "#F0F0F0", lineHeight: 1 }}>
                       {stat.value}
                     </div>
                     <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#3A3A3A", textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 4 }}>
@@ -220,7 +222,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
           {/* Scrolling ticker */}
           {upcoming.length > 0 && (
-            <div style={{ overflow: "hidden", position: "relative", marginTop: 32 }}>
+            <div style={{ overflow: "hidden", position: "relative", marginTop: 16 }}>
               <div style={{ WebkitMaskImage: "linear-gradient(to right, transparent, black 80px, black calc(100% - 80px), transparent)", maskImage: "linear-gradient(to right, transparent, black 80px, black calc(100% - 80px), transparent)" }}>
                 <div className="ticker-track">
                   {[...upcoming.slice(0, 20), ...upcoming.slice(0, 20)].map((ipo, i) => (
@@ -245,7 +247,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </section>
 
       {/* Filters */}
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px 24px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px 16px" }}>
         <Suspense fallback={null}>
           <SectorFilter sectors={sectors} />
         </Suspense>
@@ -326,6 +328,29 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           font-family: var(--font-jetbrains-mono);
           font-size: 9px;
           color: #3A3A3A;
+        }
+        @media (max-width: 640px) {
+          .header-stats { display: none !important; }
+          .stats-bar { flex-wrap: wrap !important; }
+          .stat-cell {
+            flex: none !important;
+            width: 50% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            border-left: none !important;
+            padding-top: 10px;
+            padding-bottom: 10px;
+          }
+          .stat-cell:nth-child(2),
+          .stat-cell:nth-child(4) {
+            padding-left: 16px !important;
+            border-left: 1px solid #1A1A1A !important;
+          }
+          .stat-cell:nth-child(3),
+          .stat-cell:nth-child(4) {
+            border-top: 1px solid #1A1A1A;
+          }
+          .source-desc { display: none; }
         }
       `}</style>
     </div>
