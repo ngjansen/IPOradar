@@ -95,6 +95,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 <span style={{ color: "#00FF41", fontWeight: 600 }}>{techCount}</span> tech
               </div>
             </div>
+            <Link href="/speculation" className="recent-nav-link">
+              Speculation
+            </Link>
             <Link href="/recent" className="recent-nav-link">
               Recent IPOs
             </Link>
@@ -247,14 +250,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </section>
 
       {/* Filters */}
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px 16px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(16px, 4vw, 24px) 16px" }}>
         <Suspense fallback={null}>
           <SectorFilter sectors={sectors} />
         </Suspense>
       </div>
 
       {/* Main content */}
-      <main style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px 80px" }}>
+      <main style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(16px, 4vw, 24px) 80px" }}>
         <IPOGrid upcoming={upcoming} filed={filed} activeSector={activeSector} />
       </main>
 
@@ -351,6 +354,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             border-top: 1px solid #1A1A1A;
           }
           .source-desc { display: none; }
+        }
+        @media (max-width: 480px) {
+          .hero-section { padding: 20px 16px 16px !important; }
+          .ticker-track { animation-duration: 25s; }
         }
       `}</style>
     </div>
