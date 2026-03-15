@@ -1,17 +1,54 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { fetchRecentIPOs } from "@/lib/nasdaq";
-import { IPOCard } from "@/components/IPOCard";
+import { fetchStockQuote } from "@/lib/finnhub";
+import { RecentIPOsClient } from "@/components/RecentIPOsClient";
+import type { IPO } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Recent IPOs — IPOradar",
   description: "Browse IPOs that have priced in the last 90 days. Real-time data from Nasdaq.",
 };
 
-export const revalidate = 14400;
+export const revalidate = 3600;
+
+function formatPct(pct: number): string {
+  const sign = pct >= 0 ? "+" : "";
+  return `${sign}${pct.toFixed(1)}%`;
+}
 
 export default async function RecentIPOsPage() {
-  const ipos = await fetchRecentIPOs().catch(() => []);
+  const rawIpos = await fetchRecentIPOs().catch(() => [] as IPO[]);
+
+  // Fetch quotes for first 25 IPOs in parallel
+  const toQuote = rawIpos.slice(0, 25);
+  const quoteResults = await Promise.allSettled(
+    toQuote.map((ipo) => fetchStockQuote(ipo.symbol))
+  );
+
+  const ipos: IPO[] = rawIpos.map((ipo, idx) => {
+    if (idx >= 25) return ipo;
+    const result = quoteResults[idx];
+    if (result.status !== "fulfilled" || !result.value) return ipo;
+    const quote = result.value;
+    const ipoPrice = ipo.ipoPrice;
+    const currentPrice = quote.current;
+    const perfPct = ipoPrice && ipoPrice > 0
+      ? ((currentPrice - ipoPrice) / ipoPrice) * 100
+      : undefined;
+    return { ...ipo, currentPrice, perfPct };
+  });
+
+  // Stats
+  const total = ipos.length;
+  const withPerf = ipos.filter((i) => typeof i.perfPct === "number");
+  const quotedCount = withPerf.length;
+  const bestPerformer = withPerf.length > 0
+    ? withPerf.reduce((a, b) => (b.perfPct! > a.perfPct! ? b : a))
+    : null;
+  const worstPerformer = withPerf.length > 0
+    ? withPerf.reduce((a, b) => (b.perfPct! < a.perfPct! ? b : a))
+    : null;
 
   return (
     <div style={{ minHeight: "100vh", background: "#0D0D0D" }}>
@@ -84,11 +121,95 @@ export default async function RecentIPOsPage() {
             lineHeight: 1.6,
           }}
         >
-          IPOs that have priced in the last 90 days.
+          IPOs that have priced in the last 90 days, with live post-IPO performance.
         </p>
 
+        {/* Stats bar */}
+        {total > 0 && (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: 12,
+              marginBottom: 32,
+            }}
+          >
+            {/* Total IPOs */}
+            <div
+              style={{
+                background: "#141414",
+                border: "1px solid #1E1E1E",
+                borderRadius: 10,
+                padding: "16px 20px",
+              }}
+            >
+              <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                Total IPOs
+              </div>
+              <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 28, fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.03em" }}>
+                {total}
+              </div>
+              <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, color: "#4A4A4A", marginTop: 4 }}>
+                {quotedCount} with live quotes
+              </div>
+            </div>
+
+            {/* Best performer */}
+            <div
+              style={{
+                background: "#141414",
+                border: "1px solid #1E1E1E",
+                borderRadius: 10,
+                padding: "16px 20px",
+              }}
+            >
+              <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                Best Performer
+              </div>
+              {bestPerformer ? (
+                <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                  <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 13, color: "#00FF41", fontWeight: 700 }}>
+                    ${bestPerformer.symbol}
+                  </span>
+                  <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 18, fontWeight: 700, color: "#00FF41" }}>
+                    {formatPct(bestPerformer.perfPct!)}
+                  </span>
+                </div>
+              ) : (
+                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 18, color: "#2A2A2A" }}>—</div>
+              )}
+            </div>
+
+            {/* Worst performer */}
+            <div
+              style={{
+                background: "#141414",
+                border: "1px solid #1E1E1E",
+                borderRadius: 10,
+                padding: "16px 20px",
+              }}
+            >
+              <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                Worst Performer
+              </div>
+              {worstPerformer ? (
+                <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                  <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 13, color: "#FF4444", fontWeight: 700 }}>
+                    ${worstPerformer.symbol}
+                  </span>
+                  <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 18, fontWeight: 700, color: "#FF4444" }}>
+                    {formatPct(worstPerformer.perfPct!)}
+                  </span>
+                </div>
+              ) : (
+                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 18, color: "#2A2A2A" }}>—</div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Source badge */}
-        <div style={{ marginBottom: 40 }}>
+        <div style={{ marginBottom: 28 }}>
           <a
             href="https://www.nasdaq.com/market-activity/ipos"
             target="_blank"
@@ -117,34 +238,8 @@ export default async function RecentIPOsPage() {
           </a>
         </div>
 
-        {/* Grid */}
-        {ipos.length === 0 ? (
-          <div
-            style={{
-              background: "#141414",
-              border: "1px solid #1A1A1A",
-              borderRadius: 12,
-              padding: "48px 24px",
-              textAlign: "center",
-            }}
-          >
-            <p style={{ fontFamily: "var(--font-inter)", fontSize: 14, color: "#4A4A4A", margin: 0 }}>
-              No recent IPOs found. Data refreshes every 4 hours.
-            </p>
-          </div>
-        ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: 12,
-            }}
-          >
-            {ipos.map((ipo) => (
-              <IPOCard key={ipo.symbol} ipo={ipo} />
-            ))}
-          </div>
-        )}
+        {/* Interactive grid with sort/filter */}
+        <RecentIPOsClient ipos={ipos} />
       </div>
     </div>
   );
