@@ -68,17 +68,24 @@ export function HomeTabsClient({
 
   return (
     <div>
-      {/* Tab bar */}
+      {/* Tab bar — segmented pill control */}
       <div
         style={{
           maxWidth: 1280,
           margin: "0 auto",
-          padding: "0 clamp(16px, 4vw, 24px)",
-          borderBottom: "1px solid #1A1A1A",
-          marginBottom: 24,
+          padding: "12px clamp(16px, 4vw, 24px) 0",
+          marginBottom: 20,
         }}
       >
-        <div style={{ display: "flex", alignItems: "flex-end", overflowX: "auto" }}>
+        <div
+          style={{
+            display: "inline-flex",
+            background: "#111111",
+            border: "1px solid #1E1E1E",
+            borderRadius: 8,
+            padding: 4,
+          }}
+        >
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -86,20 +93,21 @@ export function HomeTabsClient({
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 style={{
-                  background: "none",
+                  background: isActive ? "#1A1A1A" : "transparent",
                   border: "none",
-                  borderBottom: isActive ? "2px solid #00FF41" : "2px solid transparent",
-                  marginBottom: -1,
-                  paddingBottom: 12,
-                  paddingTop: 4,
-                  marginRight: 28,
+                  borderRadius: 6,
+                  borderLeft: isActive ? "2px solid #00FF41" : "2px solid transparent",
+                  paddingTop: 8,
+                  paddingBottom: 8,
+                  paddingLeft: 14,
+                  paddingRight: 14,
                   cursor: "pointer",
                   outline: "none",
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 7,
                   flexShrink: 0,
-                  transition: "color 0.15s",
+                  transition: "background 0.15s, border-color 0.15s",
                 }}
               >
                 <span
@@ -107,14 +115,14 @@ export function HomeTabsClient({
                     fontFamily: "var(--font-space-grotesk)",
                     fontSize: 13,
                     fontWeight: 600,
-                    color: isActive ? "#F0F0F0" : "#4A4A4A",
+                    color: isActive ? "#F0F0F0" : "#9A9A9A",
                     transition: "color 0.15s",
                   }}
                   onMouseEnter={(e) => {
-                    if (!isActive) (e.currentTarget as HTMLElement).style.color = "#9A9A9A";
+                    if (!isActive) (e.currentTarget as HTMLElement).style.color = "#C0C0C0";
                   }}
                   onMouseLeave={(e) => {
-                    if (!isActive) (e.currentTarget as HTMLElement).style.color = "#4A4A4A";
+                    if (!isActive) (e.currentTarget as HTMLElement).style.color = "#9A9A9A";
                   }}
                 >
                   {tab.label}
@@ -123,7 +131,7 @@ export function HomeTabsClient({
                   style={{
                     fontFamily: "var(--font-jetbrains-mono)",
                     fontSize: 10,
-                    color: isActive ? "#6A6A6A" : "#3A3A3A",
+                    color: isActive ? "#6A6A6A" : "#4A4A4A",
                   }}
                 >
                   {tab.count}

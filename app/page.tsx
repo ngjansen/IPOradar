@@ -141,7 +141,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         }}
       >
         <h1 style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(22px, 3.5vw, 36px)", fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em", lineHeight: 1.1, margin: "0 0 12px 0" }}>
-          Upcoming IPO Calendar {new Date().getFullYear()}
+          IPO Tracker
           <span style={{ color: "#00FF41", animation: "blink 1.2s step-end infinite" }}>_</span>
         </h1>
 
