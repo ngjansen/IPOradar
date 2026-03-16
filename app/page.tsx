@@ -107,6 +107,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const sectors = Array.from(new Set(allIPOs.map(ipo => ipo.sector).filter(Boolean))).sort();
   const techCount = allIPOs.filter(ipo => ipo.isTech).length;
 
+  const nextIPO = [...upcoming].sort((a, b) => a.date.localeCompare(b.date))[0] ?? null;
+  const nextIPOLabel = nextIPO?.date
+    ? new Date(nextIPO.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })
+    : "TBD";
+
   return (
     <div style={{ minHeight: "100vh", background: "#0D0D0D" }}>
       {/* Header */}
@@ -133,40 +138,94 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </header>
 
       {/* Hero */}
-      <section
-        style={{
-          maxWidth: 1280,
-          margin: "0 auto",
-          padding: "16px clamp(16px, 4vw, 24px) 0",
-        }}
-      >
-        <h1 style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(22px, 3.5vw, 36px)", fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em", lineHeight: 1.1, margin: "0 0 12px 0" }}>
-          IPO Tracker
-          <span style={{ color: "#00FF41", animation: "blink 1.2s step-end infinite" }}>_</span>
-        </h1>
+      <section style={{ position: "relative", overflow: "hidden", backgroundImage: "radial-gradient(circle, #1E1E1E 1px, transparent 1px)", backgroundSize: "24px 24px" }}>
 
-        {/* Compact stats row */}
-        {(() => {
-          const nextIPORaw = [...upcoming].sort((a, b) => a.date.localeCompare(b.date))[0]?.date;
-          const nextIPOLabel = nextIPORaw
-            ? new Date(nextIPORaw + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })
-            : "TBD";
-          return (
-            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 0, borderTop: "1px solid #1A1A1A", borderBottom: "1px solid #1A1A1A", padding: "8px 0", marginBottom: 0 }}>
-              {[
-                { value: upcoming.length, label: "confirmed", accent: "#00FF41" },
-                { value: filed.length, label: "filed", accent: "#6A6A6A" },
-                { value: techCount, label: "tech", accent: "#00FF41" },
-                { value: nextIPOLabel, label: "next", accent: "#F0F0F0" },
-              ].map((s, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "baseline", gap: 5, paddingLeft: i > 0 ? 16 : 0, paddingRight: 16, borderLeft: i > 0 ? "1px solid #1A1A1A" : "none" }}>
-                  <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 15, fontWeight: 600, color: s.accent, lineHeight: 1 }}>{s.value}</span>
-                  <span style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#3A3A3A", textTransform: "uppercase", letterSpacing: "0.08em" }}>{s.label}</span>
-                </div>
-              ))}
+        {/* Atmospheric green halo glow */}
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 80% 50% at 50% -10%, #00FF4110 0%, transparent 60%)", pointerEvents: "none" }} />
+
+        {/* Faint horizontal scan-line */}
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 0%, #00FF4104 40%, transparent 70%)", pointerEvents: "none" }} />
+
+        {/* Content */}
+        <div style={{ position: "relative", maxWidth: 1280, margin: "0 auto", padding: "clamp(32px, 5vw, 52px) clamp(16px, 4vw, 24px) clamp(24px, 4vw, 36px)" }}>
+
+          {/* Two-column: title+tagline LEFT, next-IPO spotlight RIGHT */}
+          <div className="hero-layout" style={{ display: "flex", alignItems: "flex-start", gap: 32, marginBottom: "clamp(24px, 4vw, 32px)" }}>
+
+            {/* LEFT */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {/* Pre-title */}
+              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", opacity: 0.6, letterSpacing: "0.15em", marginBottom: 12, animation: "fadeInUp 0.4s ease both", animationDelay: "0s" }}>
+                // live market intelligence
+              </div>
+              {/* H1 */}
+              <h1 style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(48px, 8vw, 88px)", fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em", lineHeight: 1, margin: 0, animation: "fadeInUp 0.4s ease both", animationDelay: "0.08s" }}>
+                IPO Tracker
+                <span style={{ color: "#00FF41", textShadow: "0 0 12px #00FF4180", animation: "blink 1.2s step-end infinite" }}>_</span>
+              </h1>
+              {/* Tagline */}
+              <p style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(13px, 1.5vw, 16px)", color: "#6A6A6A", lineHeight: 1.6, maxWidth: 480, margin: "12px 0 0 0", animation: "fadeInUp 0.4s ease both", animationDelay: "0.16s" }}>
+                Track every IPO from filing to first trade. Real-time data, hype scores, and sector filters — built for retail investors.
+              </p>
             </div>
-          );
-        })()}
+
+            {/* RIGHT: next IPO spotlight card (only if upcoming IPOs exist) */}
+            {nextIPO && (
+              <div className="hero-spotlight" style={{ flexShrink: 0, width: "clamp(220px, 28vw, 300px)", background: "linear-gradient(135deg, #111111 0%, #141414 100%)", border: "1px solid #1E1E1E", borderTop: "1px solid #00FF4140", borderRadius: 12, padding: "16px 20px", position: "relative", overflow: "hidden", animation: "fadeInUp 0.4s ease both", animationDelay: "0.24s" }}>
+                {/* Card inner glow */}
+                <div style={{ position: "absolute", top: -20, left: -20, width: 120, height: 120, background: "radial-gradient(circle, #00FF4115 0%, transparent 70%)", pointerEvents: "none" }} />
+                {/* Label */}
+                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#00FF41", opacity: 0.7, letterSpacing: "0.15em", marginBottom: 12 }}>// next pricing</div>
+                {/* Company */}
+                <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(15px, 2vw, 18px)", fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.02em", lineHeight: 1.2, marginBottom: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  {nextIPO.company}
+                </div>
+                {/* Symbol + date pill */}
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+                  {nextIPO.symbol && (
+                    <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#6A6A6A", fontWeight: 600 }}>{nextIPO.symbol}</span>
+                  )}
+                  <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, fontWeight: 600, color: "#0D0D0D", background: "#00FF41", borderRadius: 4, padding: "2px 7px", letterSpacing: "0.05em" }}>
+                    {nextIPOLabel}
+                  </span>
+                </div>
+                {/* Sector + price range */}
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  {nextIPO.sector && (
+                    <span style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", background: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: 4, padding: "2px 7px", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                      {nextIPO.sector}
+                    </span>
+                  )}
+                  {nextIPO.priceRange && nextIPO.priceRange !== "TBD" && nextIPO.priceRange !== "" && (
+                    <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#9A9A9A" }}>
+                      {nextIPO.priceRange}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Stats row — 4 rich data cards */}
+          <div className="hero-stats-row" style={{ display: "flex", gap: 8, overflowX: "auto", scrollbarWidth: "none", flexWrap: "nowrap", animation: "fadeInUp 0.4s ease both", animationDelay: "0.28s" }}>
+            {([
+              { value: String(upcoming.length), label: "Confirmed", accent: "#00FF41", glow: "0 0 12px #00FF4120", sublabel: "with date" },
+              { value: String(filed.length),    label: "Filed",     accent: "#9A9A9A", glow: undefined,            sublabel: "awaiting price" },
+              { value: String(techCount),       label: "Tech",      accent: "#00FF41", glow: "0 0 12px #00FF4120", sublabel: "sector" },
+              { value: nextIPOLabel,            label: "Next IPO",  accent: "#F0F0F0", glow: undefined,            sublabel: nextIPO ? (nextIPO.company.length > 18 ? nextIPO.company.slice(0, 16) + "…" : nextIPO.company) : "TBD" },
+            ] as const).map((stat, i) => (
+              <div key={i} style={{ flexShrink: 0, background: "#111111", border: "1px solid #1E1E1E", borderRadius: 10, padding: "16px 20px", minWidth: 110, boxShadow: stat.glow ?? "none" }}>
+                <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>{stat.label}</div>
+                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: "clamp(18px, 2.5vw, 24px)", fontWeight: 600, color: stat.accent, lineHeight: 1, marginBottom: 4 }}>{stat.value}</div>
+                <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#3A3A3A", lineHeight: 1.3 }}>{stat.sublabel}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Separator — visually bridges hero into tab bar */}
+          <div style={{ marginTop: "clamp(20px, 3vw, 28px)", height: 1, background: "linear-gradient(90deg, #1E1E1E 0%, #00FF4120 30%, #1E1E1E 100%)" }} />
+
+        </div>
       </section>
 
       {/* Tab interface */}
@@ -200,9 +259,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </footer>
 
       <style>{`
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes blink    { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 640px) {
-          .header-stats { display: none !important; }
+          .header-stats    { display: none !important; }
+          .hero-layout     { flex-direction: column !important; gap: 24px !important; }
+          .hero-spotlight  { width: 100% !important; max-width: 100% !important; }
+          .hero-stats-row  { flex-wrap: wrap !important; }
         }
       `}</style>
     </div>
