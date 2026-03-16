@@ -95,6 +95,38 @@ export interface FinnhubProfile {
   logo: string;
 }
 
+export interface StockQuote {
+  current: number;    // c — current price
+  change: number;     // d — change from prev close
+  changePct: number;  // dp — % change from prev close
+  prevClose: number;  // pc
+}
+
+export async function fetchStockQuote(symbol: string): Promise<StockQuote | null> {
+  try {
+    const key = process.env.FINNHUB_API_KEY;
+    if (!key || key === "your_finnhub_api_key_here") return null;
+
+    const res = await fetch(`${BASE}/quote?symbol=${symbol}&token=${key}`, {
+      next: { revalidate: 3600 },
+    });
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    if (!data || typeof data.c !== "number" || data.c === 0) return null;
+
+    return {
+      current: data.c,
+      change: data.d ?? 0,
+      changePct: data.dp ?? 0,
+      prevClose: data.pc ?? 0,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchCompanyProfile(symbol: string): Promise<FinnhubProfile | null> {
   try {
     const key = getKey();

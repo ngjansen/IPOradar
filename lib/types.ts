@@ -16,6 +16,9 @@ export interface IPO {
   status: IPOStatus;      // "upcoming" = confirmed date, "filed" = S-1 filed, date TBD, "priced" = IPO completed
   filedDate: string;      // when S-1 was filed (for "filed" status)
   pricedDate: string;     // when IPO priced (for "priced" status), ISO date
+  ipoPrice?: number;      // raw numeric IPO price (from Nasdaq priced row)
+  currentPrice?: number;  // current market price (from Finnhub quote)
+  perfPct?: number;       // % gain/loss since IPO: (currentPrice - ipoPrice) / ipoPrice * 100
 }
 
 export interface IPODetail extends IPO {

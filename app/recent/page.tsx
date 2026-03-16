@@ -49,6 +49,12 @@ export default async function RecentIPOsPage() {
   const worstPerformer = withPerf.length > 0
     ? withPerf.reduce((a, b) => (b.perfPct! < a.perfPct! ? b : a))
     : null;
+  const winners = withPerf.filter((i) => i.perfPct! > 0).length;
+  const losers = withPerf.filter((i) => i.perfPct! < 0).length;
+  const winRate = quotedCount > 0 ? Math.round((winners / quotedCount) * 100) : null;
+  const avgPerf = quotedCount > 0
+    ? withPerf.reduce((s, i) => s + i.perfPct!, 0) / quotedCount
+    : null;
 
   return (
     <div style={{ minHeight: "100vh", background: "#0D0D0D" }}>
@@ -129,7 +135,7 @@ export default async function RecentIPOsPage() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
+              gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
               gap: 12,
               marginBottom: 32,
             }}
@@ -200,6 +206,53 @@ export default async function RecentIPOsPage() {
                   <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 18, fontWeight: 700, color: "#FF4444" }}>
                     {formatPct(worstPerformer.perfPct!)}
                   </span>
+                </div>
+              ) : (
+                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 18, color: "#2A2A2A" }}>—</div>
+              )}
+            </div>
+
+            {/* Win Rate */}
+            <div
+              style={{
+                background: "#141414",
+                border: "1px solid #1E1E1E",
+                borderRadius: 10,
+                padding: "16px 20px",
+              }}
+            >
+              <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                Win Rate
+              </div>
+              {winRate !== null ? (
+                <>
+                  <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 28, fontWeight: 700, color: winRate >= 50 ? "#00FF41" : "#FF4444", letterSpacing: "-0.03em" }}>
+                    {winRate}%
+                  </div>
+                  <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, color: "#4A4A4A", marginTop: 4 }}>
+                    {winners}W · {losers}L of {quotedCount}
+                  </div>
+                </>
+              ) : (
+                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 18, color: "#2A2A2A" }}>—</div>
+              )}
+            </div>
+
+            {/* Avg Return */}
+            <div
+              style={{
+                background: "#141414",
+                border: "1px solid #1E1E1E",
+                borderRadius: 10,
+                padding: "16px 20px",
+              }}
+            >
+              <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+                Avg Return
+              </div>
+              {avgPerf !== null ? (
+                <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 28, fontWeight: 700, color: avgPerf >= 0 ? "#00FF41" : "#FF4444", letterSpacing: "-0.03em" }}>
+                  {formatPct(avgPerf)}
                 </div>
               ) : (
                 <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 18, color: "#2A2A2A" }}>—</div>

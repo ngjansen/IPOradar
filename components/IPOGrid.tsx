@@ -90,25 +90,14 @@ export function IPOGrid({ upcoming, filed, activeSector }: IPOGridProps) {
           {filteredUpcoming.length > 0 && (
             <div style={{ marginBottom: 48 }}>
               <SectionHeading label="Confirmed — Date Set" count={filteredUpcoming.length} tooltip="These companies have set an official IPO date. Shares will begin trading on the expected date." />
-              {imminent.length > 0 ? (
-                <>
-                  <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 12 }}>
-                    // this week
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16, marginBottom: later.length > 0 ? 24 : 0 }}>
-                    {imminent.map(ipo => <IPOCard key={ipo.symbol} ipo={ipo} />)}
-                  </div>
-                  {later.length > 0 && (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
-                      {later.map(ipo => <IPOCard key={ipo.symbol} ipo={ipo} />)}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
-                  {filteredUpcoming.map(ipo => <IPOCard key={ipo.symbol} ipo={ipo} />)}
+              {imminent.length > 0 && (
+                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 12 }}>
+                  // this week
                 </div>
               )}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(300px, 100%), 1fr))", gap: 16 }}>
+                {[...imminent, ...later].map(ipo => <IPOCard key={ipo.symbol} ipo={ipo} />)}
+              </div>
             </div>
           )}
 
@@ -121,7 +110,7 @@ export function IPOGrid({ upcoming, filed, activeSector }: IPOGridProps) {
                   These companies have filed registration statements with the SEC but have not yet set an IPO date.
                 </p>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(300px, 100%), 1fr))", gap: 12 }}>
                 {filteredFiled.map(ipo => <IPOCard key={ipo.symbol} ipo={ipo} />)}
               </div>
             </div>

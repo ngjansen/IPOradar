@@ -18,6 +18,50 @@ function formatPrice(price: number): string {
   return `$${price.toFixed(2)}`;
 }
 
+function PerfBar({ pct }: { pct: number }) {
+  const clamped = Math.max(-100, Math.min(100, pct));
+  const isPositive = pct >= 0;
+  const color = isPositive ? "#00FF41" : "#FF4444";
+  const glow = isPositive ? "0 0 6px #00FF4160" : "0 0 6px #FF444460";
+  const width = Math.abs(clamped) / 2; // half because bar fills from center
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        height: 3,
+        background: "#1A1A1A",
+        marginBottom: 14,
+        borderRadius: 2,
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          height: "100%",
+          width: `${width}%`,
+          background: color,
+          boxShadow: glow,
+          borderRadius: 2,
+          ...(isPositive ? { left: "50%" } : { right: "50%" }),
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: 0,
+          width: 1,
+          height: "100%",
+          background: "#2A2A2A",
+        }}
+      />
+    </div>
+  );
+}
+
 function PerfHero({ pct }: { pct: number }) {
   const isPositive = pct >= 0;
   const color = isPositive ? "#00FF41" : "#FF4444";
@@ -218,8 +262,12 @@ export function RecentIPOCard({ ipo }: RecentIPOCardProps) {
         </div>
       </div>
 
-      {/* Divider */}
-      <div style={{ borderTop: "1px solid #1E1E1E", marginBottom: 14 }} />
+      {/* Perf bar / divider */}
+      {hasQuote ? (
+        <PerfBar pct={ipo.perfPct!} />
+      ) : (
+        <div style={{ borderTop: "1px solid #1E1E1E", marginBottom: 14 }} />
+      )}
 
       {/* Zone 4: Footer */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>

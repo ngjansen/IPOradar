@@ -215,6 +215,7 @@ async function fetchMonthPriced(yearMonth: string): Promise<IPO[]> {
       status: "priced" as const,
       filedDate: "",
       pricedDate: parseNasdaqDate(r.pricedDate ?? ""),
+      ipoPrice: r.proposedSharePrice ? parseFloat(r.proposedSharePrice) : undefined,
     };
   });
 }
