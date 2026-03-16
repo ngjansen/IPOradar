@@ -112,6 +112,15 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     ? new Date(nextIPO.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })
     : "TBD";
 
+  // Top hype IPO (for spotlight card)
+  const topHypeIPO = [...upcoming].sort((a, b) => b.hypeScore - a.hypeScore)[0] ?? nextIPO;
+  const topHypeLabel = topHypeIPO?.date
+    ? new Date(topHypeIPO.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })
+    : "TBD";
+
+  // Top 3 by hype score for the preview strip
+  const top3 = [...upcoming].sort((a, b) => b.hypeScore - a.hypeScore).slice(0, 3);
+
   return (
     <div style={{ minHeight: "100vh", background: "#0D0D0D" }}>
       {/* Header */}
@@ -169,36 +178,46 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               </p>
             </div>
 
-            {/* RIGHT: next IPO spotlight card (only if upcoming IPOs exist) */}
-            {nextIPO && (
+            {/* RIGHT: top hype IPO spotlight card (only if upcoming IPOs exist) */}
+            {topHypeIPO && (
               <div className="hero-spotlight" style={{ flexShrink: 0, width: "clamp(220px, 28vw, 300px)", background: "linear-gradient(135deg, #111111 0%, #141414 100%)", border: "1px solid #1E1E1E", borderTop: "1px solid #00FF4140", borderRadius: 12, padding: "16px 20px", position: "relative", overflow: "hidden", animation: "fadeInUp 0.4s ease both", animationDelay: "0.24s" }}>
                 {/* Card inner glow */}
                 <div style={{ position: "absolute", top: -20, left: -20, width: 120, height: 120, background: "radial-gradient(circle, #00FF4115 0%, transparent 70%)", pointerEvents: "none" }} />
                 {/* Label */}
-                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#00FF41", opacity: 0.7, letterSpacing: "0.15em", marginBottom: 12 }}>// next pricing</div>
+                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#00FF41", opacity: 0.7, letterSpacing: "0.15em", marginBottom: 12 }}>// top pick</div>
                 {/* Company */}
                 <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(15px, 2vw, 18px)", fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.02em", lineHeight: 1.2, marginBottom: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {nextIPO.company}
+                  {topHypeIPO.company}
+                </div>
+                {/* Hype score */}
+                <div style={{ marginBottom: 10 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                    <span style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", letterSpacing: "0.08em", textTransform: "uppercase" }}>Hype Score</span>
+                    <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 13, fontWeight: 700, color: "#00FF41" }}>{topHypeIPO.hypeScore}</span>
+                  </div>
+                  <div style={{ height: 3, background: "#1A1A1A", borderRadius: 2, overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${Math.min(topHypeIPO.hypeScore, 100)}%`, background: "linear-gradient(90deg, #00FF41 0%, #00CC33 100%)", borderRadius: 2, boxShadow: "0 0 6px #00FF4160" }} />
+                  </div>
                 </div>
                 {/* Symbol + date pill */}
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
-                  {nextIPO.symbol && (
-                    <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#6A6A6A", fontWeight: 600 }}>{nextIPO.symbol}</span>
+                  {topHypeIPO.symbol && (
+                    <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#6A6A6A", fontWeight: 600 }}>{topHypeIPO.symbol}</span>
                   )}
                   <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, fontWeight: 600, color: "#0D0D0D", background: "#00FF41", borderRadius: 4, padding: "2px 7px", letterSpacing: "0.05em" }}>
-                    {nextIPOLabel}
+                    {topHypeLabel}
                   </span>
                 </div>
                 {/* Sector + price range */}
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                  {nextIPO.sector && (
+                  {topHypeIPO.sector && (
                     <span style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", background: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: 4, padding: "2px 7px", letterSpacing: "0.05em", textTransform: "uppercase" }}>
-                      {nextIPO.sector}
+                      {topHypeIPO.sector}
                     </span>
                   )}
-                  {nextIPO.priceRange && nextIPO.priceRange !== "TBD" && nextIPO.priceRange !== "" && (
+                  {topHypeIPO.priceRange && topHypeIPO.priceRange !== "TBD" && topHypeIPO.priceRange !== "" && (
                     <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#9A9A9A" }}>
-                      {nextIPO.priceRange}
+                      {topHypeIPO.priceRange}
                     </span>
                   )}
                 </div>
@@ -206,21 +225,60 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             )}
           </div>
 
-          {/* Stats row — 4 rich data cards */}
-          <div className="hero-stats-row" style={{ display: "flex", gap: 8, overflowX: "auto", scrollbarWidth: "none", flexWrap: "nowrap", animation: "fadeInUp 0.4s ease both", animationDelay: "0.28s" }}>
-            {([
-              { value: String(upcoming.length), label: "Confirmed", accent: "#00FF41", glow: "0 0 12px #00FF4120", sublabel: "with date" },
-              { value: String(filed.length),    label: "Filed",     accent: "#9A9A9A", glow: undefined,            sublabel: "awaiting price" },
-              { value: String(techCount),       label: "Tech",      accent: "#00FF41", glow: "0 0 12px #00FF4120", sublabel: "sector" },
-              { value: nextIPOLabel,            label: "Next IPO",  accent: "#F0F0F0", glow: undefined,            sublabel: nextIPO ? (nextIPO.company.length > 18 ? nextIPO.company.slice(0, 16) + "…" : nextIPO.company) : "TBD" },
-            ] as const).map((stat, i) => (
-              <div key={i} style={{ flexShrink: 0, background: "#111111", border: "1px solid #1E1E1E", borderRadius: 10, padding: "16px 20px", minWidth: 110, boxShadow: stat.glow ?? "none" }}>
-                <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>{stat.label}</div>
-                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: "clamp(18px, 2.5vw, 24px)", fontWeight: 600, color: stat.accent, lineHeight: 1, marginBottom: 4 }}>{stat.value}</div>
-                <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#3A3A3A", lineHeight: 1.3 }}>{stat.sublabel}</div>
+          {/* Compact counts */}
+          <div style={{ display: "flex", gap: 16, marginBottom: 12, animation: "fadeInUp 0.4s ease both", animationDelay: "0.28s" }}>
+            {[
+              { value: upcoming.length, label: "confirmed", color: "#00FF41" },
+              { value: filed.length,    label: "filed",     color: "#5A5A5A" },
+              { value: techCount,       label: "tech",      color: "#00FF41" },
+            ].map((s, i) => (
+              <div key={i} style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
+                <span style={{ color: s.color, fontWeight: 600 }}>{s.value}</span>
+                {" "}{s.label}
               </div>
             ))}
           </div>
+
+          {/* Top 3 by hype score */}
+          {top3.length > 0 && (
+            <div className="hero-top3" style={{ display: "flex", gap: 8, animation: "fadeInUp 0.4s ease both", animationDelay: "0.32s" }}>
+              {top3.map((ipo, i) => {
+                const dateLabel = ipo.date
+                  ? new Date(ipo.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                  : "TBD";
+                const rankColors = ["#00FF41", "#6A6A6A", "#4A4A4A"] as const;
+                return (
+                  <div key={ipo.symbol} style={{ flex: 1, minWidth: 0, background: "#111111", border: "1px solid #1E1E1E", borderRadius: 10, padding: "14px 16px", position: "relative", overflow: "hidden" }}>
+                    {/* Rank */}
+                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: rankColors[i], fontWeight: 700, marginBottom: 8, letterSpacing: "0.05em" }}>#{i + 1}</div>
+                    {/* Company */}
+                    <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 14, fontWeight: 700, color: "#E0E0E0", letterSpacing: "-0.02em", lineHeight: 1.2, marginBottom: 6, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {ipo.company}
+                    </div>
+                    {/* Ticker + date */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
+                      {ipo.symbol && (
+                        <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#5A5A5A" }}>{ipo.symbol}</span>
+                      )}
+                      <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, fontWeight: 600, color: i === 0 ? "#0D0D0D" : "#9A9A9A", background: i === 0 ? "#00FF41" : "#1A1A1A", borderRadius: 3, padding: "1px 6px" }}>
+                        {dateLabel}
+                      </span>
+                      {ipo.sector && (
+                        <span style={{ fontFamily: "var(--font-inter)", fontSize: 9, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.06em" }}>{ipo.sector}</span>
+                      )}
+                    </div>
+                    {/* Hype bar */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <div style={{ flex: 1, height: 2, background: "#1A1A1A", borderRadius: 1, overflow: "hidden" }}>
+                        <div style={{ height: "100%", width: `${Math.min(ipo.hypeScore, 100)}%`, background: i === 0 ? "#00FF41" : "#3A3A3A", borderRadius: 1 }} />
+                      </div>
+                      <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, fontWeight: 600, color: i === 0 ? "#00FF41" : "#4A4A4A", flexShrink: 0 }}>{ipo.hypeScore}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Separator — visually bridges hero into tab bar */}
           <div style={{ marginTop: "clamp(20px, 3vw, 28px)", height: 1, background: "linear-gradient(90deg, #1E1E1E 0%, #00FF4120 30%, #1E1E1E 100%)" }} />
@@ -265,7 +323,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           .header-stats    { display: none !important; }
           .hero-layout     { flex-direction: column !important; gap: 24px !important; }
           .hero-spotlight  { width: 100% !important; max-width: 100% !important; }
-          .hero-stats-row  { flex-wrap: wrap !important; }
+          .hero-top3       { flex-direction: column !important; }
         }
       `}</style>
     </div>
