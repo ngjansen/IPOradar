@@ -1,14 +1,14 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import type { Metadata } from "next";
-import { SectorFilter } from "@/components/SectorFilter";
-import { IPOGrid } from "@/components/IPOGrid";
 import { IPOAlertSignup } from "@/components/IPOAlertSignup";
+import { HomeTabsClient } from "@/components/HomeTabsClient";
 import { fetchUpcomingIPOs } from "@/lib/finnhub";
-import { fetchNasdaqIPOs } from "@/lib/nasdaq";
-import { fetchNewsCount } from "@/lib/news";
+import { fetchNasdaqIPOs, fetchRecentIPOs } from "@/lib/nasdaq";
+import { fetchStockQuote } from "@/lib/finnhub";
+import { fetchNewsCount, fetchNewsForCompany } from "@/lib/news";
 import { scoreIPOs, isTechSector } from "@/lib/scoring";
-import type { IPO } from "@/lib/types";
+import { SPECULATIVE_IPOS } from "@/lib/speculation";
+import type { IPO, NewsItem } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: `Upcoming IPO Calendar ${new Date().getFullYear()} — Discover New Public Offerings`,
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     "Track upcoming IPOs ranked by hype score. Real-time news, price ranges, and sector filters for retail investors.",
 };
 
-export const revalidate = 14400;
+export const revalidate = 3600;
 
 async function getData(): Promise<{ upcoming: IPO[]; filed: IPO[] }> {
   const today = new Date().toISOString().split("T")[0];
@@ -41,14 +41,14 @@ async function getData(): Promise<{ upcoming: IPO[]; filed: IPO[] }> {
     isTech: ipo.isTech || isTechSector(ipo.sector),
   }));
 
-  // Enrich upcoming with news counts (cap at 20)
+  // Enrich upcoming with news counts (cap at 10)
   const toEnrich = allUpcoming.slice(0, 10);
   const newsCounts = await Promise.allSettled(toEnrich.map(ipo => fetchNewsCount(ipo.company)));
   const enriched = toEnrich.map((ipo, i) => ({
     ...ipo,
     newsCount: newsCounts[i].status === "fulfilled" ? newsCounts[i].value : 0,
   }));
-  const scoredUpcoming = scoreIPOs([...enriched, ...allUpcoming.slice(20)]);
+  const scoredUpcoming = scoreIPOs([...enriched, ...allUpcoming.slice(10)]);
 
   // Filed: just Nasdaq, enrich isTech
   const scoredFiled = nasdaqFiled.map(ipo => ({
@@ -59,6 +59,37 @@ async function getData(): Promise<{ upcoming: IPO[]; filed: IPO[] }> {
   return { upcoming: scoredUpcoming, filed: scoredFiled };
 }
 
+async function getRecentData(): Promise<IPO[]> {
+  const rawIpos = await fetchRecentIPOs().catch(() => [] as IPO[]);
+
+  // Fetch quotes for first 25 IPOs in parallel
+  const toQuote = rawIpos.slice(0, 25);
+  const quoteResults = await Promise.allSettled(
+    toQuote.map((ipo) => fetchStockQuote(ipo.symbol))
+  );
+
+  return rawIpos.map((ipo, idx) => {
+    if (idx >= 25) return ipo;
+    const result = quoteResults[idx];
+    if (result.status !== "fulfilled" || !result.value) return ipo;
+    const quote = result.value;
+    const ipoPrice = ipo.ipoPrice;
+    const currentPrice = quote.current;
+    const perfPct =
+      ipoPrice && ipoPrice > 0
+        ? ((currentPrice - ipoPrice) / ipoPrice) * 100
+        : undefined;
+    return { ...ipo, currentPrice, perfPct };
+  });
+}
+
+async function getSpeculationData(): Promise<NewsItem[][]> {
+  const newsResults = await Promise.allSettled(
+    SPECULATIVE_IPOS.map((c) => fetchNewsForCompany(c.name))
+  );
+  return newsResults.map((r) => (r.status === "fulfilled" ? r.value : []));
+}
+
 interface HomePageProps {
   searchParams: Promise<{ sector?: string }>;
 }
@@ -67,7 +98,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const params = await searchParams;
   const activeSector = params.sector || "All";
 
-  const { upcoming, filed } = await getData();
+  const [{ upcoming, filed }, recentIpos, specNewsMap] = await Promise.all([
+    getData(),
+    getRecentData(),
+    getSpeculationData(),
+  ]);
 
   const allIPOs = [...upcoming, ...filed];
   const sectors = Array.from(new Set(allIPOs.map(ipo => ipo.sector).filter(Boolean))).sort();
@@ -84,24 +119,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               IPO<span style={{ color: "#00FF41" }}>radar</span>
             </span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-            <div className="header-stats" style={{ display: "flex", alignItems: "center", gap: 20 }}>
-              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
-                <span style={{ color: "#F0F0F0", fontWeight: 600 }}>{upcoming.length}</span> confirmed
-              </div>
-              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
-                <span style={{ color: "#6A6A6A", fontWeight: 600 }}>{filed.length}</span> filed
-              </div>
-              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
-                <span style={{ color: "#00FF41", fontWeight: 600 }}>{techCount}</span> tech
-              </div>
+          <div className="header-stats" style={{ display: "flex", alignItems: "center", gap: 20 }}>
+            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
+              <span style={{ color: "#F0F0F0", fontWeight: 600 }}>{upcoming.length}</span> confirmed
             </div>
-            <Link href="/speculation" className="recent-nav-link">
-              Speculation
-            </Link>
-            <Link href="/recent" className="recent-nav-link">
-              Recent IPOs
-            </Link>
+            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
+              <span style={{ color: "#6A6A6A", fontWeight: 600 }}>{filed.length}</span> filed
+            </div>
+            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
+              <span style={{ color: "#00FF41", fontWeight: 600 }}>{techCount}</span> tech
+            </div>
           </div>
         </div>
       </header>
@@ -164,7 +191,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           </h1>
 
           <p style={{ fontFamily: "var(--font-inter)", fontSize: 15, color: "#6A6A6A", maxWidth: 520, lineHeight: 1.6, margin: "0 0 0 0" }}>
-            Confirmed IPOs with set dates, plus all recently filed S-1s. Updated every 4 hours.
+            Confirmed IPOs with set dates, plus all recently filed S-1s. Updated every hour.
           </p>
 
           {/* Stats bar */}
@@ -253,17 +280,17 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </div>
       </section>
 
-      {/* Filters */}
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(16px, 4vw, 24px) 16px" }}>
-        <Suspense fallback={null}>
-          <SectorFilter sectors={sectors} />
-        </Suspense>
-      </div>
-
-      {/* Main content */}
-      <main style={{ maxWidth: 1280, margin: "0 auto", padding: "0 clamp(16px, 4vw, 24px) 80px" }}>
-        <IPOGrid upcoming={upcoming} filed={filed} activeSector={activeSector} />
-      </main>
+      {/* Tab interface */}
+      <Suspense fallback={null}>
+        <HomeTabsClient
+          upcoming={upcoming}
+          filed={filed}
+          sectors={sectors}
+          activeSector={activeSector}
+          recentIpos={recentIpos}
+          specNewsMap={specNewsMap}
+        />
+      </Suspense>
 
       {/* Footer */}
       <footer style={{ borderTop: "1px solid #1A1A1A", padding: "32px 24px", textAlign: "center" }}>
@@ -275,7 +302,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <a href="https://finnhub.io" target="_blank" rel="noopener noreferrer" style={{ color: "#4A4A4A", textDecoration: "underline", textDecorationColor: "#2A2A2A" }}>Finnhub</a>.
             {" "}News via{" "}
             <a href="https://news.google.com" target="_blank" rel="noopener noreferrer" style={{ color: "#4A4A4A", textDecoration: "underline", textDecorationColor: "#2A2A2A" }}>Google News</a>.
-            {" "}Data refreshed every 4 hours.
+            {" "}Data refreshed every hour.
           </p>
           <p style={{ fontFamily: "var(--font-inter)", fontSize: 11, color: "#2A2A2A", margin: 0 }}>
             Not financial advice. For informational purposes only.
@@ -301,17 +328,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           pointer-events: none;
           z-index: 0;
         }
-        .recent-nav-link {
-          font-family: var(--font-inter);
-          font-size: 12px;
-          color: #6A6A6A;
-          text-decoration: none;
-          border: 1px solid #222;
-          border-radius: 6px;
-          padding: 4px 10px;
-          transition: color 0.15s, border-color 0.15s;
-        }
-        .recent-nav-link:hover { color: #F0F0F0; border-color: #3A3A3A; }
         .source-badge {
           display: inline-flex;
           align-items: center;
