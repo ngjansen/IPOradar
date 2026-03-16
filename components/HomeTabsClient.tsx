@@ -68,22 +68,23 @@ export function HomeTabsClient({
 
   return (
     <div>
-      {/* Tab bar — segmented pill control */}
+      {/* Tab bar */}
       <div
         style={{
           maxWidth: 1280,
           margin: "0 auto",
-          padding: "12px clamp(16px, 4vw, 24px) 0",
-          marginBottom: 20,
+          padding: "0 clamp(16px, 4vw, 24px)",
+          marginBottom: 24,
         }}
       >
         <div
           style={{
-            display: "inline-flex",
-            background: "#111111",
-            border: "1px solid #1E1E1E",
-            borderRadius: 8,
-            padding: 4,
+            display: "flex",
+            background: "#0F0F0F",
+            border: "1px solid #252525",
+            borderRadius: 10,
+            padding: 5,
+            gap: 4,
           }}
         >
           {tabs.map((tab) => {
@@ -93,36 +94,41 @@ export function HomeTabsClient({
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 style={{
-                  background: isActive ? "#1A1A1A" : "transparent",
+                  flex: 1,
+                  background: isActive
+                    ? "linear-gradient(135deg, #1C1C1C 0%, #181818 100%)"
+                    : "transparent",
                   border: "none",
-                  borderRadius: 6,
-                  borderLeft: isActive ? "2px solid #00FF41" : "2px solid transparent",
-                  paddingTop: 8,
-                  paddingBottom: 8,
-                  paddingLeft: 14,
-                  paddingRight: 14,
+                  borderRadius: 7,
+                  borderTop: isActive ? "1px solid #00FF4140" : "1px solid transparent",
+                  boxShadow: isActive ? "0 1px 8px #00000060, 0 0 0 1px #2A2A2A" : "none",
+                  paddingTop: 12,
+                  paddingBottom: 12,
+                  paddingLeft: 20,
+                  paddingRight: 20,
                   cursor: "pointer",
                   outline: "none",
-                  display: "inline-flex",
+                  display: "flex",
                   alignItems: "center",
-                  gap: 7,
-                  flexShrink: 0,
-                  transition: "background 0.15s, border-color 0.15s",
+                  justifyContent: "center",
+                  gap: 8,
+                  transition: "background 0.15s, box-shadow 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) (e.currentTarget as HTMLElement).style.background = "#161616";
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) (e.currentTarget as HTMLElement).style.background = "transparent";
                 }}
               >
                 <span
                   style={{
                     fontFamily: "var(--font-space-grotesk)",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: isActive ? "#F0F0F0" : "#9A9A9A",
+                    fontSize: 15,
+                    fontWeight: isActive ? 700 : 500,
+                    color: isActive ? "#F0F0F0" : "#5A5A5A",
+                    letterSpacing: "-0.02em",
                     transition: "color 0.15s",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActive) (e.currentTarget as HTMLElement).style.color = "#C0C0C0";
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) (e.currentTarget as HTMLElement).style.color = "#9A9A9A";
                   }}
                 >
                   {tab.label}
@@ -130,8 +136,14 @@ export function HomeTabsClient({
                 <span
                   style={{
                     fontFamily: "var(--font-jetbrains-mono)",
-                    fontSize: 10,
-                    color: isActive ? "#6A6A6A" : "#4A4A4A",
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: isActive ? "#00FF41" : "#3A3A3A",
+                    background: isActive ? "#00FF4115" : "#1A1A1A",
+                    border: isActive ? "1px solid #00FF4130" : "1px solid #222222",
+                    borderRadius: 5,
+                    padding: "1px 7px",
+                    transition: "color 0.15s, background 0.15s",
                   }}
                 >
                   {tab.count}
