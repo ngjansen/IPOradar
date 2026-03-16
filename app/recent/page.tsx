@@ -261,6 +261,81 @@ export default async function RecentIPOsPage() {
           </div>
         )}
 
+        {/* Broker CTA row */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            marginBottom: 20,
+            padding: "12px 16px",
+            background: "#141414",
+            border: "1px solid #222",
+            borderRadius: 8,
+            flexWrap: "wrap",
+          }}
+        >
+          <span
+            style={{
+              flex: 1,
+              fontFamily: "var(--font-inter)",
+              fontSize: 12,
+              color: "#6A6A6A",
+              minWidth: 120,
+            }}
+          >
+            Ready to trade these IPOs?
+          </span>
+          <a
+            href="https://robinhood.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              background: "#00FF41",
+              color: "#0D0D0D",
+              fontFamily: "var(--font-inter)",
+              fontSize: 12,
+              fontWeight: 700,
+              textDecoration: "none",
+              borderRadius: 6,
+              padding: "6px 12px",
+            }}
+          >
+            Robinhood →
+          </a>
+          <a
+            href="https://www.webull.com/ipo"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              background: "transparent",
+              color: "#9A9A9A",
+              fontFamily: "var(--font-inter)",
+              fontSize: 12,
+              fontWeight: 500,
+              textDecoration: "none",
+              borderRadius: 6,
+              padding: "6px 12px",
+              border: "1px solid #2A2A2A",
+            }}
+          >
+            Webull →
+          </a>
+          <span
+            style={{
+              fontFamily: "var(--font-inter)",
+              fontSize: 10,
+              color: "#3A3A3A",
+            }}
+          >
+            Not financial advice.
+          </span>
+        </div>
+
         {/* Source badge */}
         <div style={{ marginBottom: 28 }}>
           <a

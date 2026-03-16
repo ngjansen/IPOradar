@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 import type { IPODetail } from "@/lib/types";
 import { LetterAvatar } from "@/components/LetterAvatar";
 import { NewsFeed } from "@/components/NewsFeed";
+import { BrokerCTA } from "@/components/BrokerCTA";
+import { IPOAlertSignup } from "@/components/IPOAlertSignup";
 import { fetchUpcomingIPOs, fetchCompanyProfile, fetchStockQuote } from "@/lib/finnhub";
 import type { StockQuote } from "@/lib/finnhub";
 import { fetchNasdaqIPOs, fetchRecentIPOs } from "@/lib/nasdaq";
@@ -516,6 +518,9 @@ export default async function IPODetailPage({
           );
         })()}
 
+        {/* Broker CTA */}
+        <BrokerCTA symbol={ipo.symbol} status={ipo.status} company={ipo.company} />
+
         {/* Two-column layout */}
         <div
           style={{
@@ -671,18 +676,26 @@ export default async function IPODetailPage({
             </div>
           </div>
 
-          {/* Right: news feed */}
+          {/* Right: news feed + email capture */}
           <div
             style={{
-              background: "#141414",
-              border: "1px solid #222",
-              borderRadius: 12,
-              padding: "24px",
               position: "sticky",
               top: 72,
+              overflowY: "auto",
+              maxHeight: "calc(100vh - 80px)",
             }}
           >
-            <NewsFeed company={ipo.company} />
+            <div
+              style={{
+                background: "#141414",
+                border: "1px solid #222",
+                borderRadius: 12,
+                padding: "24px",
+              }}
+            >
+              <NewsFeed company={ipo.company} />
+            </div>
+            <IPOAlertSignup />
           </div>
         </div>
       </div>

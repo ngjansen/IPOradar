@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { SectorFilter } from "@/components/SectorFilter";
 import { IPOGrid } from "@/components/IPOGrid";
+import { IPOAlertSignup } from "@/components/IPOAlertSignup";
 import { fetchUpcomingIPOs } from "@/lib/finnhub";
 import { fetchNasdaqIPOs } from "@/lib/nasdaq";
 import { fetchNewsCount } from "@/lib/news";
@@ -193,6 +194,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               </div>
             );
           })()}
+
+          {/* Email capture */}
+          <IPOAlertSignup compact />
 
           {/* Source badges */}
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
