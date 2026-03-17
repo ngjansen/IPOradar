@@ -120,28 +120,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   return (
     <div style={{ minHeight: "100vh", background: "#0D0D0D" }}>
-      {/* Header */}
-      <header style={{ borderBottom: "1px solid #1A1A1A", background: "#0D0D0D", position: "sticky", top: 0, zIndex: 50, backdropFilter: "blur(12px)" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#00FF41", boxShadow: "0 0 8px #00FF41, 0 0 16px #00FF4160", animation: "blink 2s ease-in-out infinite" }} />
-            <span style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 18, fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em" }}>
-              IPO<span style={{ color: "#00FF41" }}>radar</span>
-            </span>
-          </div>
-          <div className="header-stats" style={{ display: "flex", alignItems: "center", gap: 20 }}>
-            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
-              <span style={{ color: "#F0F0F0", fontWeight: 600 }}>{upcoming.length}</span> confirmed
-            </div>
-            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
-              <span style={{ color: "#6A6A6A", fontWeight: 600 }}>{filed.length}</span> filed
-            </div>
-            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
-              <span style={{ color: "#00FF41", fontWeight: 600 }}>{techCount}</span> tech
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Hero */}
       <section style={{ position: "relative", overflow: "hidden", backgroundImage: "radial-gradient(circle, #1E1E1E 1px, transparent 1px)", backgroundSize: "24px 24px" }}>
@@ -155,6 +133,15 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         {/* Content */}
         <div style={{ position: "relative", maxWidth: 1280, margin: "0 auto", padding: "clamp(24px, 3vw, 36px) clamp(16px, 4vw, 24px) clamp(12px, 2vw, 20px)" }}>
 
+          {/* Brand row — replaces header */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+            <span style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 15, fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em" }}>
+              IPO<span style={{ color: "#00FF41" }}>radar</span>
+            </span>
+            <span style={{ color: "#3A3A3A", fontSize: 13 }}>•</span>
+            <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#00FF41", boxShadow: "0 0 6px #00FF41, 0 0 12px #00FF4160", animation: "blink 2s ease-in-out infinite" }} />
+          </div>
+
           {/* Two-column: title+tagline LEFT, next-IPO spotlight RIGHT */}
           <div className="hero-layout" style={{ display: "flex", alignItems: "flex-start", gap: 32, marginBottom: "clamp(24px, 4vw, 32px)" }}>
 
@@ -162,16 +149,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <div style={{ flex: 1, minWidth: 0 }}>
               {/* Pre-title */}
               <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", opacity: 0.6, letterSpacing: "0.15em", marginBottom: 12, animation: "fadeInUp 0.4s ease both", animationDelay: "0s" }}>
-                // live market intelligence
+                Real-time IPO intelligence
               </div>
               {/* H1 */}
               <h1 style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(48px, 8vw, 88px)", fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em", lineHeight: 1, margin: 0, animation: "fadeInUp 0.4s ease both", animationDelay: "0.08s" }}>
-                IPO Tracker
+                IPO Radar
                 <span style={{ color: "#00FF41", textShadow: "0 0 12px #00FF4180", animation: "blink 1.2s step-end infinite" }}>_</span>
               </h1>
               {/* Tagline */}
               <p style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(13px, 1.5vw, 16px)", color: "#6A6A6A", lineHeight: 1.6, maxWidth: 480, margin: "12px 0 0 0", animation: "fadeInUp 0.4s ease both", animationDelay: "0.16s" }}>
-                Track every IPO from filing to first trade. Real-time data, hype scores, and sector filters — built for retail investors.
+                Never miss a market debut. Track every IPO from SEC filing to first trade — with hype scores, price ranges, and sector filters.
               </p>
             </div>
 
@@ -218,22 +205,30 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                     </span>
                   )}
                 </div>
-                {/* Mini stats divider + row */}
-                <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid #1E1E1E" }}>
-                  <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#3A3A3A", letterSpacing: "0.05em" }}>
-                    <span style={{ color: "#F0F0F0" }}>{upcoming.length}</span> confirmed
-                    {" · "}
-                    <span style={{ color: "#6A6A6A" }}>{filed.length}</span> filed
-                    {" · "}
-                    <span style={{ color: "#00FF41" }}>{techCount}</span> tech
-                  </div>
-                </div>
               </div>
             )}
           </div>
 
+          {/* Live stats bar */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: "clamp(16px, 2vw, 24px)", animation: "fadeInUp 0.4s ease both", animationDelay: "0.32s" }}>
+            <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, fontWeight: 600, color: "#00FF41", background: "#00FF4118", border: "1px solid #00FF4130", borderRadius: 20, padding: "4px 12px" }}>
+              {upcoming.length} confirmed
+            </span>
+            <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, fontWeight: 600, color: "#6A6A6A", background: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: 20, padding: "4px 12px" }}>
+              {filed.length} filed
+            </span>
+            <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, fontWeight: 600, color: "#00FF41", background: "#00FF4110", border: "1px solid #00FF4120", borderRadius: 20, padding: "4px 12px" }}>
+              {techCount} tech
+            </span>
+            {nextIPO && (
+              <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, fontWeight: 700, color: "#0D0D0D", background: "#00FF41", borderRadius: 20, padding: "4px 12px" }}>
+                Next: {nextIPOLabel}
+              </span>
+            )}
+          </div>
+
           {/* Separator — visually bridges hero into tab bar */}
-          <div style={{ marginTop: "clamp(16px, 2vw, 24px)", height: 1, background: "linear-gradient(90deg, #1E1E1E 0%, #00FF4120 30%, #1E1E1E 100%)" }} />
+          <div style={{ height: 1, background: "linear-gradient(90deg, #1E1E1E 0%, #00FF4120 30%, #1E1E1E 100%)" }} />
 
         </div>
       </section>
@@ -272,7 +267,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         @keyframes blink    { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 640px) {
-          .header-stats    { display: none !important; }
           .hero-layout     { flex-direction: column !important; gap: 24px !important; }
           .hero-spotlight  { width: 100% !important; max-width: 100% !important; }
         }

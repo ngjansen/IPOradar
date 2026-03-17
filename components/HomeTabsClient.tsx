@@ -72,7 +72,7 @@ export function HomeTabsClient({
       <div
         style={{
           position: "sticky",
-          top: 56,
+          top: 0,
           zIndex: 40,
           background: "#0F0F0F",
           borderBottom: "1px solid #1E1E1E",
