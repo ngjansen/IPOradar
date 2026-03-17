@@ -14,16 +14,18 @@ interface IPOGridProps {
 
 function SectionHeading({ label, count, dim, tooltip }: { label: string; count: number; dim?: boolean; tooltip?: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 16 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+      {/* Accent bar */}
+      <div style={{ width: 3, height: 18, borderRadius: 2, background: dim ? "#2A2A2A" : "#00FF41", flexShrink: 0 }} />
       <Tooltip definition={tooltip ?? ""}>
         <h2
           style={{
             fontFamily: "var(--font-space-grotesk)",
-            fontSize: 13,
+            fontSize: 12,
             fontWeight: 700,
-            color: dim ? "#4A4A4A" : "#F0F0F0",
+            color: dim ? "#3A3A3A" : "#C0C0C0",
             textTransform: "uppercase",
-            letterSpacing: "0.1em",
+            letterSpacing: "0.12em",
             margin: 0,
           }}
         >
@@ -34,7 +36,12 @@ function SectionHeading({ label, count, dim, tooltip }: { label: string; count: 
         style={{
           fontFamily: "var(--font-jetbrains-mono)",
           fontSize: 11,
-          color: "#3A3A3A",
+          fontWeight: 600,
+          color: dim ? "#2A2A2A" : "#00FF41",
+          background: dim ? "#111111" : "#00FF4115",
+          border: `1px solid ${dim ? "#1E1E1E" : "#00FF4130"}`,
+          borderRadius: 8,
+          padding: "1px 8px",
         }}
       >
         {count}
@@ -91,8 +98,9 @@ export function IPOGrid({ upcoming, filed, activeSector }: IPOGridProps) {
             <div style={{ marginBottom: 48 }}>
               <SectionHeading label="Confirmed — Date Set" count={filteredUpcoming.length} tooltip="These companies have set an official IPO date. Shares will begin trading on the expected date." />
               {imminent.length > 0 && (
-                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 12 }}>
-                  // this week
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#00FF41", boxShadow: "0 0 8px #00FF41, 0 0 16px #00FF4160" }} />
+                  <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", textTransform: "uppercase", letterSpacing: "0.15em" }}>this week</span>
                 </div>
               )}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(300px, 100%), 1fr))", gap: 16 }}>

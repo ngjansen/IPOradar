@@ -189,297 +189,89 @@ export function HomeTabsClient({
           }}
         >
           {/* Header */}
-          <div style={{ marginBottom: 8 }}>
-            <span
-              style={{
-                fontFamily: "var(--font-jetbrains-mono)",
-                fontSize: 11,
-                color: "#6A6A6A",
-                textTransform: "uppercase",
-                letterSpacing: "0.15em",
-              }}
-            >
-              // last 90 days
-            </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+            <div style={{ width: 3, height: 22, borderRadius: 2, background: "#00FF41", flexShrink: 0 }} />
+            <div>
+              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#00FF41", opacity: 0.6, letterSpacing: "0.15em", marginBottom: 2 }}>// last 90 days</div>
+              <h2 style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em", lineHeight: 1, margin: 0 }}>
+                Recent IPOs
+              </h2>
+            </div>
           </div>
-          <h2
-            style={{
-              fontFamily: "var(--font-space-grotesk)",
-              fontSize: "clamp(20px, 3vw, 32px)",
-              fontWeight: 700,
-              color: "#F0F0F0",
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-              margin: "0 0 8px 0",
-            }}
-          >
-            Recent IPOs
-          </h2>
-          <p
-            style={{
-              fontFamily: "var(--font-inter)",
-              fontSize: 14,
-              color: "#6A6A6A",
-              margin: "0 0 24px 0",
-              lineHeight: 1.6,
-            }}
-          >
-            IPOs that have priced in the last 90 days, with live post-IPO performance.
-          </p>
 
           {/* Stats bar */}
           {recentIpos.length > 0 && (
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-                gap: 12,
-                marginBottom: 32,
+                gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+                gap: 10,
+                marginBottom: 28,
               }}
             >
               {/* Total IPOs */}
-              <div
-                style={{
-                  background: "#141414",
-                  border: "1px solid #1E1E1E",
-                  borderRadius: 10,
-                  padding: "16px 20px",
-                }}
-              >
-                <div
-                  style={{
-                    fontFamily: "var(--font-inter)",
-                    fontSize: 11,
-                    color: "#4A4A4A",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    marginBottom: 6,
-                  }}
-                >
-                  Total IPOs
-                </div>
-                <div
-                  style={{
-                    fontFamily: "var(--font-space-grotesk)",
-                    fontSize: 28,
-                    fontWeight: 700,
-                    color: "#F0F0F0",
-                    letterSpacing: "-0.03em",
-                  }}
-                >
+              <div style={{ background: "#0F0F0F", border: "1px solid #1E1E1E", borderTop: "2px solid #2A2A2A", borderRadius: 10, padding: "16px 20px" }}>
+                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 9, color: "#3A3A3A", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>Total</div>
+                <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 40, fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em", lineHeight: 1 }}>
                   {recentIpos.length}
                 </div>
-                <div
-                  style={{
-                    fontFamily: "var(--font-inter)",
-                    fontSize: 11,
-                    color: "#4A4A4A",
-                    marginTop: 4,
-                  }}
-                >
-                  {quotedCount} with live quotes
-                </div>
+                <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#3A3A3A", marginTop: 6 }}>{quotedCount} live quotes</div>
               </div>
 
               {/* Best performer */}
-              <div
-                style={{
-                  background: "#141414",
-                  border: "1px solid #1E1E1E",
-                  borderRadius: 10,
-                  padding: "16px 20px",
-                }}
-              >
-                <div
-                  style={{
-                    fontFamily: "var(--font-inter)",
-                    fontSize: 11,
-                    color: "#4A4A4A",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    marginBottom: 6,
-                  }}
-                >
-                  Best Performer
-                </div>
+              <div style={{ background: "linear-gradient(135deg, #0C1A0E 0%, #0F1A10 100%)", border: "1px solid #00FF4130", borderTop: "2px solid #00FF41", borderRadius: 10, padding: "16px 20px" }}>
+                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 9, color: "#00FF4180", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>Best</div>
                 {bestPerformer ? (
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                    <span
-                      style={{
-                        fontFamily: "var(--font-jetbrains-mono)",
-                        fontSize: 13,
-                        color: "#00FF41",
-                        fontWeight: 700,
-                      }}
-                    >
-                      ${bestPerformer.symbol}
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: "var(--font-jetbrains-mono)",
-                        fontSize: 18,
-                        fontWeight: 700,
-                        color: "#00FF41",
-                      }}
-                    >
+                  <>
+                    <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 36, fontWeight: 700, color: "#00FF41", letterSpacing: "-0.04em", lineHeight: 1 }}>
                       {formatPct(bestPerformer.perfPct!)}
-                    </span>
-                  </div>
+                    </div>
+                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF4160", marginTop: 6 }}>${bestPerformer.symbol}</div>
+                  </>
                 ) : (
-                  <div
-                    style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 18, color: "#2A2A2A" }}
-                  >
-                    —
-                  </div>
+                  <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 28, color: "#1A1A1A" }}>—</div>
                 )}
               </div>
 
               {/* Worst performer */}
-              <div
-                style={{
-                  background: "#141414",
-                  border: "1px solid #1E1E1E",
-                  borderRadius: 10,
-                  padding: "16px 20px",
-                }}
-              >
-                <div
-                  style={{
-                    fontFamily: "var(--font-inter)",
-                    fontSize: 11,
-                    color: "#4A4A4A",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    marginBottom: 6,
-                  }}
-                >
-                  Worst Performer
-                </div>
+              <div style={{ background: "linear-gradient(135deg, #1A0C0C 0%, #1A0F0F 100%)", border: "1px solid #FF444430", borderTop: "2px solid #FF4444", borderRadius: 10, padding: "16px 20px" }}>
+                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 9, color: "#FF444480", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>Worst</div>
                 {worstPerformer ? (
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                    <span
-                      style={{
-                        fontFamily: "var(--font-jetbrains-mono)",
-                        fontSize: 13,
-                        color: "#FF4444",
-                        fontWeight: 700,
-                      }}
-                    >
-                      ${worstPerformer.symbol}
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: "var(--font-jetbrains-mono)",
-                        fontSize: 18,
-                        fontWeight: 700,
-                        color: "#FF4444",
-                      }}
-                    >
+                  <>
+                    <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 36, fontWeight: 700, color: "#FF4444", letterSpacing: "-0.04em", lineHeight: 1 }}>
                       {formatPct(worstPerformer.perfPct!)}
-                    </span>
-                  </div>
+                    </div>
+                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#FF444460", marginTop: 6 }}>${worstPerformer.symbol}</div>
+                  </>
                 ) : (
-                  <div
-                    style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 18, color: "#2A2A2A" }}
-                  >
-                    —
-                  </div>
+                  <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 28, color: "#1A1A1A" }}>—</div>
                 )}
               </div>
 
               {/* Win Rate */}
-              <div
-                style={{
-                  background: "#141414",
-                  border: "1px solid #1E1E1E",
-                  borderRadius: 10,
-                  padding: "16px 20px",
-                }}
-              >
-                <div
-                  style={{
-                    fontFamily: "var(--font-inter)",
-                    fontSize: 11,
-                    color: "#4A4A4A",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    marginBottom: 6,
-                  }}
-                >
-                  Win Rate
-                </div>
+              <div style={{ background: "#0F0F0F", border: "1px solid #1E1E1E", borderTop: `2px solid ${winRate !== null && winRate >= 50 ? "#00FF41" : winRate !== null ? "#FF4444" : "#2A2A2A"}`, borderRadius: 10, padding: "16px 20px" }}>
+                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 9, color: "#3A3A3A", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>Win Rate</div>
                 {winRate !== null ? (
                   <>
-                    <div
-                      style={{
-                        fontFamily: "var(--font-space-grotesk)",
-                        fontSize: 28,
-                        fontWeight: 700,
-                        color: winRate >= 50 ? "#00FF41" : "#FF4444",
-                        letterSpacing: "-0.03em",
-                      }}
-                    >
+                    <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 40, fontWeight: 700, color: winRate >= 50 ? "#00FF41" : "#FF4444", letterSpacing: "-0.04em", lineHeight: 1 }}>
                       {winRate}%
                     </div>
-                    <div
-                      style={{
-                        fontFamily: "var(--font-inter)",
-                        fontSize: 11,
-                        color: "#4A4A4A",
-                        marginTop: 4,
-                      }}
-                    >
-                      {winners}W · {losers}L of {quotedCount}
-                    </div>
+                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#3A3A3A", marginTop: 6 }}>{winners}W · {losers}L</div>
                   </>
                 ) : (
-                  <div
-                    style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 18, color: "#2A2A2A" }}
-                  >
-                    —
-                  </div>
+                  <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 28, color: "#1A1A1A" }}>—</div>
                 )}
               </div>
 
               {/* Avg Return */}
-              <div
-                style={{
-                  background: "#141414",
-                  border: "1px solid #1E1E1E",
-                  borderRadius: 10,
-                  padding: "16px 20px",
-                }}
-              >
-                <div
-                  style={{
-                    fontFamily: "var(--font-inter)",
-                    fontSize: 11,
-                    color: "#4A4A4A",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    marginBottom: 6,
-                  }}
-                >
-                  Avg Return
-                </div>
+              <div style={{ background: "#0F0F0F", border: "1px solid #1E1E1E", borderTop: `2px solid ${avgPerf !== null && avgPerf >= 0 ? "#00FF41" : avgPerf !== null ? "#FF4444" : "#2A2A2A"}`, borderRadius: 10, padding: "16px 20px" }}>
+                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 9, color: "#3A3A3A", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>Avg Return</div>
                 {avgPerf !== null ? (
-                  <div
-                    style={{
-                      fontFamily: "var(--font-space-grotesk)",
-                      fontSize: 28,
-                      fontWeight: 700,
-                      color: avgPerf >= 0 ? "#00FF41" : "#FF4444",
-                      letterSpacing: "-0.03em",
-                    }}
-                  >
+                  <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 40, fontWeight: 700, color: avgPerf >= 0 ? "#00FF41" : "#FF4444", letterSpacing: "-0.04em", lineHeight: 1 }}>
                     {formatPct(avgPerf)}
                   </div>
                 ) : (
-                  <div
-                    style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 18, color: "#2A2A2A" }}
-                  >
-                    —
-                  </div>
+                  <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 28, color: "#1A1A1A" }}>—</div>
                 )}
               </div>
             </div>
@@ -573,176 +365,51 @@ export function HomeTabsClient({
           }}
         >
           {/* Header */}
-          <div style={{ marginBottom: 8 }}>
-            <span
-              style={{
-                fontFamily: "var(--font-jetbrains-mono)",
-                fontSize: 11,
-                color: "#FFB800",
-                textTransform: "uppercase",
-                letterSpacing: "0.15em",
-              }}
-            >
-              // rumoured · unconfirmed
-            </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+            <div style={{ width: 3, height: 22, borderRadius: 2, background: "#FFB800", flexShrink: 0 }} />
+            <div>
+              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#FFB800", opacity: 0.6, letterSpacing: "0.15em", marginBottom: 2 }}>// rumoured · unconfirmed</div>
+              <h2 style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em", lineHeight: 1, margin: 0 }}>
+                IPO Watch
+              </h2>
+            </div>
           </div>
-          <h2
-            style={{
-              fontFamily: "var(--font-space-grotesk)",
-              fontSize: "clamp(20px, 3vw, 32px)",
-              fontWeight: 700,
-              color: "#F0F0F0",
-              letterSpacing: "-0.04em",
-              lineHeight: 1.1,
-              margin: "0 0 8px 0",
-            }}
-          >
-            IPO Watch
-          </h2>
-          <p
-            style={{
-              fontFamily: "var(--font-inter)",
-              fontSize: 14,
-              color: "#6A6A6A",
-              margin: "0 0 24px 0",
-              lineHeight: 1.6,
-            }}
-          >
-            High-profile private companies where an IPO has been discussed in the press — but nothing has been filed or confirmed.
-          </p>
 
           {/* Disclaimer banner */}
           <div
             style={{
-              background: "#FFB80008",
-              border: "1px solid #FFB80025",
-              borderLeft: "3px solid #FFB80060",
+              background: "#141200",
+              border: "1px solid #2A2000",
+              borderLeft: "3px solid #FFB800",
               borderRadius: 8,
-              padding: "14px 18px",
-              marginBottom: 28,
+              padding: "12px 16px",
+              marginBottom: 24,
               display: "flex",
-              alignItems: "flex-start",
+              alignItems: "center",
               gap: 10,
             }}
           >
-            <span
-              style={{
-                fontFamily: "var(--font-jetbrains-mono)",
-                fontSize: 11,
-                color: "#FFB800",
-                flexShrink: 0,
-                marginTop: 1,
-              }}
-            >
-              ⚠
-            </span>
-            <p
-              style={{
-                fontFamily: "var(--font-inter)",
-                fontSize: 12,
-                color: "#8A7A5A",
-                margin: 0,
-                lineHeight: 1.6,
-              }}
-            >
-              These companies have not filed with the SEC. Coverage is based on publicly available news and analyst commentary. Nothing here constitutes financial advice.
+            <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#FFB800", flexShrink: 0 }}>⚠</span>
+            <p style={{ fontFamily: "var(--font-inter)", fontSize: 12, color: "#6A5A30", margin: 0, lineHeight: 1.5 }}>
+              No SEC filings. Coverage based on public news and analyst commentary. Not financial advice.
             </p>
           </div>
 
           {/* Stats bar */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: 12,
-              marginBottom: 32,
-              maxWidth: 480,
-            }}
-          >
-            <div
-              style={{
-                background: "#141414",
-                border: "1px solid #1E1E1E",
-                borderRadius: 10,
-                padding: "16px 20px",
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: "var(--font-inter)",
-                  fontSize: 11,
-                  color: "#4A4A4A",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.1em",
-                  marginBottom: 6,
-                }}
-              >
-                Total Tracked
-              </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-space-grotesk)",
-                  fontSize: 28,
-                  fontWeight: 700,
-                  color: "#FFB800",
-                  letterSpacing: "-0.03em",
-                }}
-              >
+          <div style={{ display: "flex", gap: 10, marginBottom: 28, maxWidth: 400 }}>
+            <div style={{ flex: 1, background: "linear-gradient(135deg, #141200 0%, #131100 100%)", border: "1px solid #2A2000", borderTop: "2px solid #FFB800", borderRadius: 10, padding: "16px 20px" }}>
+              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 9, color: "#6A5000", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>Tracked</div>
+              <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 40, fontWeight: 700, color: "#FFB800", letterSpacing: "-0.04em", lineHeight: 1 }}>
                 {SPECULATIVE_IPOS.length}
               </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-inter)",
-                  fontSize: 11,
-                  color: "#4A4A4A",
-                  marginTop: 4,
-                }}
-              >
-                companies
-              </div>
+              <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A3A00", marginTop: 6 }}>companies</div>
             </div>
-
-            <div
-              style={{
-                background: "#141414",
-                border: "1px solid #1E1E1E",
-                borderRadius: 10,
-                padding: "16px 20px",
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: "var(--font-inter)",
-                  fontSize: 11,
-                  color: "#4A4A4A",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.1em",
-                  marginBottom: 6,
-                }}
-              >
-                Total News Articles
-              </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-space-grotesk)",
-                  fontSize: 28,
-                  fontWeight: 700,
-                  color: "#F0F0F0",
-                  letterSpacing: "-0.03em",
-                }}
-              >
+            <div style={{ flex: 1, background: "#0F0F0F", border: "1px solid #1E1E1E", borderTop: "2px solid #2A2A2A", borderRadius: 10, padding: "16px 20px" }}>
+              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 9, color: "#3A3A3A", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>Articles</div>
+              <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 40, fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em", lineHeight: 1 }}>
                 {totalArticles}
               </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-inter)",
-                  fontSize: 11,
-                  color: "#4A4A4A",
-                  marginTop: 4,
-                }}
-              >
-                recent articles
-              </div>
+              <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#3A3A3A", marginTop: 6 }}>recent news</div>
             </div>
           </div>
 

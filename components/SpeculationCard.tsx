@@ -24,24 +24,22 @@ export function SpeculationCard({ company, news }: SpeculationCardProps) {
   return (
     <div
       style={{
-        background: "#141414",
-        border: "1px solid #1E1E1E",
-        borderLeft: "2px solid #FFB80040",
+        background: "linear-gradient(135deg, #141200 0%, #131100 100%)",
+        border: "1px solid #2A2200",
+        borderLeft: "3px solid #FFB800",
         borderRadius: 12,
         padding: "20px",
-        transition: "transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease",
+        transition: "transform 0.15s ease, box-shadow 0.15s ease",
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget as HTMLElement;
         el.style.transform = "translateY(-2px)";
-        el.style.boxShadow = "-3px 0 12px #FFB80015";
-        el.style.borderColor = "#2A2A2A";
+        el.style.boxShadow = "0 8px 32px #FFB80015";
       }}
       onMouseLeave={(e) => {
         const el = e.currentTarget as HTMLElement;
         el.style.transform = "translateY(0)";
         el.style.boxShadow = "";
-        el.style.borderColor = "#1E1E1E";
       }}
     >
       {/* Zone 1: Avatar + Company Name + UNCONFIRMED badge */}
@@ -65,18 +63,18 @@ export function SpeculationCard({ company, news }: SpeculationCardProps) {
         <span
           style={{
             fontFamily: "var(--font-jetbrains-mono)",
-            fontSize: 10,
-            color: "#FFB800",
-            background: "#FFB80015",
-            border: "1px solid #FFB80050",
+            fontSize: 9,
+            color: "#0D0D0D",
+            background: "#FFB800",
             borderRadius: 4,
-            padding: "2px 7px",
+            padding: "3px 8px",
             textTransform: "uppercase",
-            letterSpacing: "0.1em",
+            letterSpacing: "0.12em",
+            fontWeight: 700,
             flexShrink: 0,
           }}
         >
-          UNCONFIRMED
+          RUMOURED
         </span>
       </div>
 
@@ -96,27 +94,33 @@ export function SpeculationCard({ company, news }: SpeculationCardProps) {
             fontFamily: "var(--font-inter)",
             fontSize: 10,
             color: "#6A6A6A",
+            background: "#1A1500",
+            border: "1px solid #2A2000",
+            borderRadius: 4,
+            padding: "2px 7px",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
           }}
         >
           {company.sector}
         </span>
-        <span style={{ color: "#2A2A2A", fontSize: 10 }}>·</span>
         <span
           style={{
             fontFamily: "var(--font-jetbrains-mono)",
-            fontSize: 10,
+            fontSize: 13,
             color: "#FFB800",
-            fontWeight: 600,
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
           }}
         >
           {company.valuation}
         </span>
-        <span style={{ color: "#2A2A2A", fontSize: 10 }}>·</span>
+        <span style={{ color: "#2A2000", fontSize: 10 }}>·</span>
         <span
           style={{
             fontFamily: "var(--font-inter)",
             fontSize: 10,
-            color: "#4A4A4A",
+            color: "#6A5A30",
           }}
         >
           {company.timeline}
@@ -127,11 +131,10 @@ export function SpeculationCard({ company, news }: SpeculationCardProps) {
       <div style={{ borderTop: "1px solid #1E1E1E", marginBottom: 14 }} />
 
       {/* Zone 3: News headlines */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 0, marginBottom: 14 }}>
         {topNews.length > 0 ? (
           topNews.map((item, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-              <span style={{ color: "#2A2A2A", fontSize: 10, flexShrink: 0 }}>•</span>
+            <div key={i} style={{ borderTop: i === 0 ? "none" : "1px solid #1E1800", paddingTop: i === 0 ? 0 : 8, paddingBottom: 8 }}>
               <a
                 href={item.url}
                 target="_blank"
@@ -139,26 +142,28 @@ export function SpeculationCard({ company, news }: SpeculationCardProps) {
                 style={{
                   fontFamily: "var(--font-inter)",
                   fontSize: 12,
-                  color: "#9A9A9A",
+                  color: "#8A7A50",
                   textDecoration: "none",
+                  display: "block",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
-                  flex: 1,
-                  minWidth: 0,
+                  lineHeight: 1.4,
+                  marginBottom: 2,
                 }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "#C0C0C0"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "#9A9A9A"; }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "#C0A840"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "#8A7A50"; }}
               >
                 {item.title}
               </a>
               {item.source && (
                 <span
                   style={{
-                    fontFamily: "var(--font-inter)",
-                    fontSize: 10,
-                    color: "#4A4A4A",
-                    flexShrink: 0,
+                    fontFamily: "var(--font-jetbrains-mono)",
+                    fontSize: 9,
+                    color: "#3A3000",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
                   }}
                 >
                   {item.source}
@@ -171,11 +176,11 @@ export function SpeculationCard({ company, news }: SpeculationCardProps) {
             style={{
               fontFamily: "var(--font-inter)",
               fontSize: 12,
-              color: "#3A3A3A",
+              color: "#3A3A30",
               fontStyle: "italic",
             }}
           >
-            No recent IPO news found
+            No recent news found
           </div>
         )}
       </div>

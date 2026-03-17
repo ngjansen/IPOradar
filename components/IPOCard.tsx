@@ -30,12 +30,13 @@ function daysUntil(dateStr: string): number {
 
 function HypeBar({ score }: { score: number }) {
   const pct = Math.min(100, Math.round(score * 5));
+  const isHot = score >= 10;
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-      <div style={{ flex: 1, height: 3, background: "#222", borderRadius: 2, overflow: "hidden" }}>
-        <div style={{ width: `${pct}%`, height: "100%", background: "linear-gradient(90deg, #00FF41, #00FF4180)", borderRadius: 2 }} />
+      <div style={{ flex: 1, height: 5, background: "#1A1A1A", borderRadius: 3, overflow: "hidden" }}>
+        <div style={{ width: `${pct}%`, height: "100%", background: isHot ? "linear-gradient(90deg, #00FF41, #00CC33)" : "linear-gradient(90deg, #00FF4160, #00FF4130)", borderRadius: 3, boxShadow: isHot ? "0 0 8px #00FF4180" : "none" }} />
       </div>
-      <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", whiteSpace: "nowrap" }}>
+      <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, fontWeight: 700, color: isHot ? "#00FF41" : "#3A3A3A", whiteSpace: "nowrap" }}>
         {score.toFixed(1)}
       </span>
     </div>
@@ -49,36 +50,50 @@ export function IPOCard({ ipo }: IPOCardProps) {
   const days = !isCompact && ipo.date ? daysUntil(ipo.date) : -1;
   const isImminent = days >= 0 && days <= 7;
 
-  const borderColor = isFiled ? "#1E1E1E" : isPriced ? "#1E1E1E" : ipo.isTech ? "#00FF4130" : "#222222";
+  // Color identity
+  const upcomingBg = isImminent
+    ? "linear-gradient(135deg, #0C1A0E 0%, #0F1A10 100%)"
+    : ipo.isTech
+    ? "linear-gradient(135deg, #0E1812 0%, #111811 100%)"
+    : "linear-gradient(135deg, #111414 0%, #121414 100%)";
+  const upcomingBorder = isImminent ? "#00FF4160" : ipo.isTech ? "#00FF4130" : "#1E2A1E";
+  const filedBg = "#0D0D0D";
+  const filedBorder = "#181818";
+
+  const cardBg = isCompact ? filedBg : upcomingBg;
+  const borderColor = isCompact ? filedBorder : upcomingBorder;
 
   return (
     <Link
       href={`/ipo/${ipo.symbol}`}
       style={{
         display: "block",
-        background: isCompact ? "#111111" : "#141414",
+        background: cardBg,
         border: `1px solid ${borderColor}`,
         borderRadius: 12,
-        padding: isCompact ? "16px 20px" : "20px",
+        padding: isCompact ? "14px 18px" : "20px",
         textDecoration: "none",
-        transition: "transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease",
-        opacity: isCompact ? 0.75 : 1,
-        ...(!isCompact && isImminent ? { borderTop: "2px solid #00FF41" } : {}),
-        ...(!isCompact && !isImminent && ipo.isTech ? { borderLeft: "2px solid #00FF41", boxShadow: "-4px 0 16px #00FF4115" } : {}),
+        transition: "transform 0.15s ease, box-shadow 0.15s ease",
+        opacity: isCompact ? 0.65 : 1,
+        ...(isImminent ? { borderTop: "2px solid #00FF41", boxShadow: "0 0 0 1px #00FF4115 inset" } : {}),
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget as HTMLElement;
         el.style.opacity = "1";
         el.style.transform = "translateY(-2px)";
-        el.style.borderColor = isCompact ? "#2a2a2a" : ipo.isTech ? "#00FF4160" : "#333333";
-        if (!isCompact) el.style.boxShadow = ipo.isTech ? "-4px 0 16px #00FF4125, 0 8px 24px #00000060" : "0 8px 24px #00000060";
+        el.style.boxShadow = isCompact
+          ? "0 4px 16px #00000040"
+          : isImminent
+          ? "0 8px 32px #00FF4120, 0 0 0 1px #00FF4120 inset"
+          : ipo.isTech
+          ? "0 8px 32px #00FF4115"
+          : "0 8px 24px #00000060";
       }}
       onMouseLeave={(e) => {
         const el = e.currentTarget as HTMLElement;
-        el.style.opacity = isCompact ? "0.75" : "1";
+        el.style.opacity = isCompact ? "0.65" : "1";
         el.style.transform = "translateY(0)";
-        el.style.borderColor = borderColor;
-        if (!isCompact) el.style.boxShadow = ipo.isTech ? "-4px 0 16px #00FF4115" : "";
+        el.style.boxShadow = isImminent ? "0 0 0 1px #00FF4115 inset" : "";
       }}
     >
       {/* Top row */}
@@ -182,7 +197,7 @@ export function IPOCard({ ipo }: IPOCardProps) {
                   Expected Date
                 </div>
               </Tooltip>
-              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: isImminent ? "#00FF41" : "#9A9A9A", fontWeight: isImminent ? 600 : 400 }}>
+              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: isImminent ? "#00FF41" : "#B0B0B0", fontWeight: isImminent ? 700 : 500 }}>
                 {ipo.date ? formatDate(ipo.date) : "TBD"}
               </div>
             </div>
@@ -192,7 +207,7 @@ export function IPOCard({ ipo }: IPOCardProps) {
                   Price Range
                 </div>
               </Tooltip>
-              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: "#F0F0F0" }}>
+              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, fontWeight: 600, color: "#E0E0E0" }}>
                 {ipo.priceRange}
               </div>
             </div>
@@ -203,7 +218,7 @@ export function IPOCard({ ipo }: IPOCardProps) {
                     Offer Size
                   </div>
                 </Tooltip>
-                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: "#F0F0F0" }}>
+                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, fontWeight: 600, color: "#E0E0E0" }}>
                   {ipo.offerAmount}
                 </div>
               </div>

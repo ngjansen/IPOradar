@@ -73,15 +73,17 @@ function PerfHero({ pct }: { pct: number }) {
     <span
       style={{
         fontFamily: "var(--font-jetbrains-mono)",
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: 700,
         color,
         background: bg,
         border: `1px solid ${border}`,
         borderRadius: 8,
-        padding: "6px 12px",
+        padding: "6px 14px",
         whiteSpace: "nowrap",
         flexShrink: 0,
+        letterSpacing: "-0.02em",
+        boxShadow: isPositive ? "0 0 12px #00FF4120" : "0 0 12px #FF444420",
       }}
     >
       {sign}{pct.toFixed(1)}%
@@ -94,17 +96,19 @@ export function RecentIPOCard({ ipo }: RecentIPOCardProps) {
   const isWinner = hasQuote && ipo.perfPct! >= 0;
   const isLoser = hasQuote && ipo.perfPct! < 0;
 
-  const borderColor = hasQuote ? "#1E1E1E" : "#1A1A1A";
-  const leftBorder = isWinner
-    ? "2px solid #00FF4130"
+  // Color identity
+  const cardBg = isWinner
+    ? "linear-gradient(135deg, #0C1A0E 0%, #0F1A10 100%)"
     : isLoser
-    ? "2px solid #FF444430"
-    : "2px solid transparent";
+    ? "linear-gradient(135deg, #1A0C0C 0%, #1A0F0F 100%)"
+    : "#111111";
+  const borderColor = isWinner ? "#00FF4130" : isLoser ? "#FF444430" : "#1A1A1A";
+  const leftBorderColor = isWinner ? "#00FF41" : isLoser ? "#FF4444" : "transparent";
 
   const hoverGlow = isWinner
-    ? "-3px 0 12px #00FF4115"
+    ? "0 8px 32px #00FF4120"
     : isLoser
-    ? "-3px 0 12px #FF444415"
+    ? "0 8px 32px #FF444420"
     : "0 8px 24px #00000060";
 
   return (
@@ -112,25 +116,23 @@ export function RecentIPOCard({ ipo }: RecentIPOCardProps) {
       href={`/ipo/${ipo.symbol}`}
       style={{
         display: "block",
-        background: "#141414",
+        background: cardBg,
         border: `1px solid ${borderColor}`,
-        borderLeft: leftBorder,
+        borderLeft: `3px solid ${leftBorderColor}`,
         borderRadius: 12,
         padding: "20px",
         textDecoration: "none",
-        transition: "transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease",
+        transition: "transform 0.15s ease, box-shadow 0.15s ease",
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget as HTMLElement;
         el.style.transform = "translateY(-2px)";
         el.style.boxShadow = hoverGlow;
-        if (!hasQuote) el.style.borderColor = "#222";
       }}
       onMouseLeave={(e) => {
         const el = e.currentTarget as HTMLElement;
         el.style.transform = "translateY(0)";
         el.style.boxShadow = "";
-        el.style.borderColor = borderColor;
       }}
     >
       {/* Zone 1: Avatar + Company Name + Hero Perf Pill */}
