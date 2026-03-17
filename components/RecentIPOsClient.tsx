@@ -7,7 +7,6 @@ import { RecentIPOCard } from "./RecentIPOCard";
 import { LetterAvatar } from "./LetterAvatar";
 
 type SortKey = "newest" | "best" | "worst" | "largest";
-type QuoteFilter = "all" | "winners" | "losers";
 type ViewMode = "grid" | "list";
 
 interface RecentIPOsClientProps {
@@ -191,7 +190,6 @@ function RecentIPORow({ ipo }: { ipo: IPO }) {
 
 export function RecentIPOsClient({ ipos }: RecentIPOsClientProps) {
   const [sort, setSort] = useState<SortKey>("newest");
-  const [quoteFilter, setQuoteFilter] = useState<QuoteFilter>("all");
   const [activeSector, setActiveSector] = useState<string>("All");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
@@ -208,16 +206,6 @@ export function RecentIPOsClient({ ipos }: RecentIPOsClientProps) {
 
   const filtered = useMemo(() => {
     let result = [...ipos];
-
-    if (quoteFilter === "winners") {
-      result = result.filter(
-        (i) => typeof i.perfPct === "number" && i.perfPct >= 0
-      );
-    } else if (quoteFilter === "losers") {
-      result = result.filter(
-        (i) => typeof i.perfPct === "number" && i.perfPct < 0
-      );
-    }
 
     if (activeSector !== "All") {
       result = result.filter((i) => i.sector === activeSector);
@@ -255,7 +243,7 @@ export function RecentIPOsClient({ ipos }: RecentIPOsClientProps) {
     }
 
     return result;
-  }, [ipos, sort, quoteFilter, activeSector]);
+  }, [ipos, sort, activeSector]);
 
   const grouped = useMemo(() => {
     if (sort !== "newest") return null;
@@ -320,7 +308,7 @@ export function RecentIPOsClient({ ipos }: RecentIPOsClientProps) {
         })}
       </div>
 
-      {/* Row 2: Quote filter + sector pills */}
+      {/* Row 2: Sector pills */}
       <div
         style={{
           display: "flex",
@@ -330,47 +318,6 @@ export function RecentIPOsClient({ ipos }: RecentIPOsClientProps) {
           marginBottom: 12,
         }}
       >
-        {/* Segmented quote filter */}
-        <div
-          style={{
-            display: "inline-flex",
-            border: "1px solid #222",
-            borderRadius: 20,
-            overflow: "hidden",
-          }}
-        >
-          {(["all", "winners", "losers"] as QuoteFilter[]).map((opt) => {
-            const isActive = quoteFilter === opt;
-            const label =
-              opt === "all" ? "All" : opt === "winners" ? "Winners" : "Losers";
-            const activeColor = opt === "losers" ? "#FF4444" : "#00FF41";
-            const activeBg = opt === "losers" ? "#FF444415" : "#00FF4115";
-
-            return (
-              <button
-                key={opt}
-                onClick={() => setQuoteFilter(opt)}
-                style={{
-                  fontFamily: "var(--font-inter)",
-                  fontSize: 12,
-                  fontWeight: isActive ? 600 : 400,
-                  color: isActive ? activeColor : "#6A6A6A",
-                  background: isActive ? activeBg : "#141414",
-                  border: "none",
-                  borderRadius: 0,
-                  padding: "6px 14px",
-                  cursor: "pointer",
-                  transition: "color 0.15s ease, background 0.15s ease",
-                  outline: "none",
-                }}
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Sector pills */}
         {["All", ...sectors].map((sector) => {
           const isActive = activeSector === sector;
           return (

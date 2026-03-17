@@ -19,11 +19,6 @@ interface HomeTabsClientProps {
 
 type TabId = "upcoming" | "recent" | "speculation";
 
-function formatPct(pct: number): string {
-  const sign = pct >= 0 ? "+" : "";
-  return `${sign}${pct.toFixed(1)}%`;
-}
-
 export function HomeTabsClient({
   upcoming,
   filed,
@@ -33,26 +28,6 @@ export function HomeTabsClient({
   specNewsMap,
 }: HomeTabsClientProps) {
   const [activeTab, setActiveTab] = useState<TabId>("upcoming");
-
-  // Recent panel stats
-  const withPerf = recentIpos.filter((i) => typeof i.perfPct === "number");
-  const quotedCount = withPerf.length;
-  const bestPerformer =
-    withPerf.length > 0
-      ? withPerf.reduce((a, b) => (b.perfPct! > a.perfPct! ? b : a))
-      : null;
-  const worstPerformer =
-    withPerf.length > 0
-      ? withPerf.reduce((a, b) => (b.perfPct! < a.perfPct! ? b : a))
-      : null;
-  const winners = withPerf.filter((i) => i.perfPct! > 0).length;
-  const losers = withPerf.filter((i) => i.perfPct! < 0).length;
-  const winRate =
-    quotedCount > 0 ? Math.round((winners / quotedCount) * 100) : null;
-  const avgPerf =
-    quotedCount > 0
-      ? withPerf.reduce((s, i) => s + i.perfPct!, 0) / quotedCount
-      : null;
 
   // Speculation panel stats
   const totalArticles = specNewsMap.reduce(
@@ -188,170 +163,6 @@ export function HomeTabsClient({
             padding: "0 clamp(16px, 4vw, 24px) 80px",
           }}
         >
-          {/* Header */}
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-            <div style={{ width: 3, height: 22, borderRadius: 2, background: "#00FF41", flexShrink: 0 }} />
-            <div>
-              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#00FF41", opacity: 0.6, letterSpacing: "0.15em", marginBottom: 2 }}>// last 90 days</div>
-              <h2 style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em", lineHeight: 1, margin: 0 }}>
-                Recent IPOs
-              </h2>
-            </div>
-          </div>
-
-          {/* Stats bar */}
-          {recentIpos.length > 0 && (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-                gap: 10,
-                marginBottom: 28,
-              }}
-            >
-              {/* Total IPOs */}
-              <div style={{ background: "#0F0F0F", border: "1px solid #1E1E1E", borderTop: "2px solid #2A2A2A", borderRadius: 10, padding: "16px 20px" }}>
-                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 9, color: "#3A3A3A", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>Total</div>
-                <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 40, fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em", lineHeight: 1 }}>
-                  {recentIpos.length}
-                </div>
-                <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#3A3A3A", marginTop: 6 }}>{quotedCount} live quotes</div>
-              </div>
-
-              {/* Best performer */}
-              <div style={{ background: "linear-gradient(135deg, #0C1A0E 0%, #0F1A10 100%)", border: "1px solid #00FF4130", borderTop: "2px solid #00FF41", borderRadius: 10, padding: "16px 20px" }}>
-                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 9, color: "#00FF4180", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>Best</div>
-                {bestPerformer ? (
-                  <>
-                    <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 36, fontWeight: 700, color: "#00FF41", letterSpacing: "-0.04em", lineHeight: 1 }}>
-                      {formatPct(bestPerformer.perfPct!)}
-                    </div>
-                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF4160", marginTop: 6 }}>${bestPerformer.symbol}</div>
-                  </>
-                ) : (
-                  <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 28, color: "#1A1A1A" }}>—</div>
-                )}
-              </div>
-
-              {/* Worst performer */}
-              <div style={{ background: "linear-gradient(135deg, #1A0C0C 0%, #1A0F0F 100%)", border: "1px solid #FF444430", borderTop: "2px solid #FF4444", borderRadius: 10, padding: "16px 20px" }}>
-                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 9, color: "#FF444480", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>Worst</div>
-                {worstPerformer ? (
-                  <>
-                    <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 36, fontWeight: 700, color: "#FF4444", letterSpacing: "-0.04em", lineHeight: 1 }}>
-                      {formatPct(worstPerformer.perfPct!)}
-                    </div>
-                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#FF444460", marginTop: 6 }}>${worstPerformer.symbol}</div>
-                  </>
-                ) : (
-                  <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 28, color: "#1A1A1A" }}>—</div>
-                )}
-              </div>
-
-              {/* Win Rate */}
-              <div style={{ background: "#0F0F0F", border: "1px solid #1E1E1E", borderTop: `2px solid ${winRate !== null && winRate >= 50 ? "#00FF41" : winRate !== null ? "#FF4444" : "#2A2A2A"}`, borderRadius: 10, padding: "16px 20px" }}>
-                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 9, color: "#3A3A3A", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>Win Rate</div>
-                {winRate !== null ? (
-                  <>
-                    <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 40, fontWeight: 700, color: winRate >= 50 ? "#00FF41" : "#FF4444", letterSpacing: "-0.04em", lineHeight: 1 }}>
-                      {winRate}%
-                    </div>
-                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#3A3A3A", marginTop: 6 }}>{winners}W · {losers}L</div>
-                  </>
-                ) : (
-                  <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 28, color: "#1A1A1A" }}>—</div>
-                )}
-              </div>
-
-              {/* Avg Return */}
-              <div style={{ background: "#0F0F0F", border: "1px solid #1E1E1E", borderTop: `2px solid ${avgPerf !== null && avgPerf >= 0 ? "#00FF41" : avgPerf !== null ? "#FF4444" : "#2A2A2A"}`, borderRadius: 10, padding: "16px 20px" }}>
-                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 9, color: "#3A3A3A", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>Avg Return</div>
-                {avgPerf !== null ? (
-                  <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 40, fontWeight: 700, color: avgPerf >= 0 ? "#00FF41" : "#FF4444", letterSpacing: "-0.04em", lineHeight: 1 }}>
-                    {formatPct(avgPerf)}
-                  </div>
-                ) : (
-                  <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 28, color: "#1A1A1A" }}>—</div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Broker CTA row */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              marginBottom: 20,
-              padding: "12px 16px",
-              background: "#141414",
-              border: "1px solid #222",
-              borderRadius: 8,
-              flexWrap: "wrap",
-            }}
-          >
-            <span
-              style={{
-                flex: 1,
-                fontFamily: "var(--font-inter)",
-                fontSize: 12,
-                color: "#6A6A6A",
-                minWidth: 120,
-              }}
-            >
-              Ready to trade these IPOs?
-            </span>
-            <a
-              href="https://robinhood.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                background: "#00FF41",
-                color: "#0D0D0D",
-                fontFamily: "var(--font-inter)",
-                fontSize: 12,
-                fontWeight: 700,
-                textDecoration: "none",
-                borderRadius: 6,
-                padding: "6px 12px",
-              }}
-            >
-              Robinhood →
-            </a>
-            <a
-              href="https://www.webull.com/quote/us/ipo"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                background: "transparent",
-                color: "#9A9A9A",
-                fontFamily: "var(--font-inter)",
-                fontSize: 12,
-                fontWeight: 500,
-                textDecoration: "none",
-                borderRadius: 6,
-                padding: "6px 12px",
-                border: "1px solid #2A2A2A",
-              }}
-            >
-              Webull →
-            </a>
-            <span
-              style={{
-                fontFamily: "var(--font-inter)",
-                fontSize: 10,
-                color: "#3A3A3A",
-              }}
-            >
-              Not financial advice.
-            </span>
-          </div>
-
           <RecentIPOsClient ipos={recentIpos} />
         </div>
       )}
