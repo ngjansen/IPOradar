@@ -68,23 +68,24 @@ export function HomeTabsClient({
 
   return (
     <div>
-      {/* Tab bar */}
+      {/* Tab bar — sticky below header */}
       <div
         style={{
-          maxWidth: 1280,
-          margin: "0 auto",
-          padding: "0 clamp(16px, 4vw, 24px)",
+          position: "sticky",
+          top: 56,
+          zIndex: 40,
+          background: "#0F0F0F",
+          borderBottom: "1px solid #1E1E1E",
           marginBottom: 24,
         }}
       >
         <div
           style={{
+            maxWidth: 1280,
+            margin: "0 auto",
+            padding: "0 clamp(16px, 4vw, 24px)",
             display: "flex",
-            background: "#0F0F0F",
-            border: "1px solid #252525",
-            borderRadius: 10,
-            padding: 5,
-            gap: 4,
+            gap: 0,
           }}
         >
           {tabs.map((tab) => {
@@ -95,40 +96,40 @@ export function HomeTabsClient({
                 onClick={() => setActiveTab(tab.id)}
                 style={{
                   flex: 1,
-                  background: isActive
-                    ? "linear-gradient(135deg, #1C1C1C 0%, #181818 100%)"
-                    : "transparent",
+                  background: "transparent",
                   border: "none",
-                  borderRadius: 7,
-                  borderTop: isActive ? "1px solid #00FF4140" : "1px solid transparent",
-                  boxShadow: isActive ? "0 1px 8px #00000060, 0 0 0 1px #2A2A2A" : "none",
-                  paddingTop: 12,
-                  paddingBottom: 12,
+                  borderBottom: isActive ? "2px solid #00FF41" : "2px solid transparent",
+                  paddingTop: 0,
+                  paddingBottom: 0,
                   paddingLeft: 20,
                   paddingRight: 20,
+                  height: 52,
                   cursor: "pointer",
                   outline: "none",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   gap: 8,
-                  transition: "background 0.15s, box-shadow 0.15s",
+                  transition: "border-color 0.15s ease",
                 }}
                 onMouseEnter={(e) => {
-                  if (!isActive) (e.currentTarget as HTMLElement).style.background = "#161616";
+                  const label = (e.currentTarget as HTMLElement).querySelector(".tab-label") as HTMLElement | null;
+                  if (label && !isActive) label.style.color = "#6A6A6A";
                 }}
                 onMouseLeave={(e) => {
-                  if (!isActive) (e.currentTarget as HTMLElement).style.background = "transparent";
+                  const label = (e.currentTarget as HTMLElement).querySelector(".tab-label") as HTMLElement | null;
+                  if (label && !isActive) label.style.color = "#4A4A4A";
                 }}
               >
                 <span
+                  className="tab-label"
                   style={{
                     fontFamily: "var(--font-space-grotesk)",
-                    fontSize: 15,
+                    fontSize: 14,
                     fontWeight: isActive ? 700 : 500,
-                    color: isActive ? "#F0F0F0" : "#5A5A5A",
-                    letterSpacing: "-0.02em",
-                    transition: "color 0.15s",
+                    color: isActive ? "#F0F0F0" : "#4A4A4A",
+                    letterSpacing: "-0.01em",
+                    transition: "color 0.15s ease",
                   }}
                 >
                   {tab.label}
@@ -139,11 +140,10 @@ export function HomeTabsClient({
                     fontSize: 11,
                     fontWeight: 600,
                     color: isActive ? "#00FF41" : "#3A3A3A",
-                    background: isActive ? "#00FF4115" : "#1A1A1A",
-                    border: isActive ? "1px solid #00FF4130" : "1px solid #222222",
-                    borderRadius: 5,
-                    padding: "1px 7px",
-                    transition: "color 0.15s, background 0.15s",
+                    background: isActive ? "#00FF4120" : "#1A1A1A",
+                    borderRadius: 10,
+                    padding: "2px 8px",
+                    transition: "color 0.15s ease, background 0.15s ease",
                   }}
                 >
                   {tab.count}

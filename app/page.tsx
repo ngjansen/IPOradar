@@ -118,9 +118,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     ? new Date(topHypeIPO.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })
     : "TBD";
 
-  // Top 3 by hype score for the preview strip
-  const top3 = [...upcoming].sort((a, b) => b.hypeScore - a.hypeScore).slice(0, 3);
-
   return (
     <div style={{ minHeight: "100vh", background: "#0D0D0D" }}>
       {/* Header */}
@@ -156,7 +153,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 0%, #00FF4104 40%, transparent 70%)", pointerEvents: "none" }} />
 
         {/* Content */}
-        <div style={{ position: "relative", maxWidth: 1280, margin: "0 auto", padding: "clamp(32px, 5vw, 52px) clamp(16px, 4vw, 24px) clamp(24px, 4vw, 36px)" }}>
+        <div style={{ position: "relative", maxWidth: 1280, margin: "0 auto", padding: "clamp(24px, 3vw, 36px) clamp(16px, 4vw, 24px) clamp(12px, 2vw, 20px)" }}>
 
           {/* Two-column: title+tagline LEFT, next-IPO spotlight RIGHT */}
           <div className="hero-layout" style={{ display: "flex", alignItems: "flex-start", gap: 32, marginBottom: "clamp(24px, 4vw, 32px)" }}>
@@ -221,67 +218,22 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                     </span>
                   )}
                 </div>
+                {/* Mini stats divider + row */}
+                <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid #1E1E1E" }}>
+                  <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#3A3A3A", letterSpacing: "0.05em" }}>
+                    <span style={{ color: "#F0F0F0" }}>{upcoming.length}</span> confirmed
+                    {" · "}
+                    <span style={{ color: "#6A6A6A" }}>{filed.length}</span> filed
+                    {" · "}
+                    <span style={{ color: "#00FF41" }}>{techCount}</span> tech
+                  </div>
+                </div>
               </div>
             )}
           </div>
 
-          {/* Compact counts */}
-          <div style={{ display: "flex", gap: 16, marginBottom: 12, animation: "fadeInUp 0.4s ease both", animationDelay: "0.28s" }}>
-            {[
-              { value: upcoming.length, label: "confirmed", color: "#00FF41" },
-              { value: filed.length,    label: "filed",     color: "#5A5A5A" },
-              { value: techCount,       label: "tech",      color: "#00FF41" },
-            ].map((s, i) => (
-              <div key={i} style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A" }}>
-                <span style={{ color: s.color, fontWeight: 600 }}>{s.value}</span>
-                {" "}{s.label}
-              </div>
-            ))}
-          </div>
-
-          {/* Top 3 by hype score */}
-          {top3.length > 0 && (
-            <div className="hero-top3" style={{ display: "flex", gap: 8, animation: "fadeInUp 0.4s ease both", animationDelay: "0.32s" }}>
-              {top3.map((ipo, i) => {
-                const dateLabel = ipo.date
-                  ? new Date(ipo.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                  : "TBD";
-                const rankColors = ["#00FF41", "#6A6A6A", "#4A4A4A"] as const;
-                return (
-                  <div key={ipo.symbol} style={{ flex: 1, minWidth: 0, background: "#111111", border: "1px solid #1E1E1E", borderRadius: 10, padding: "14px 16px", position: "relative", overflow: "hidden" }}>
-                    {/* Rank */}
-                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: rankColors[i], fontWeight: 700, marginBottom: 8, letterSpacing: "0.05em" }}>#{i + 1}</div>
-                    {/* Company */}
-                    <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 14, fontWeight: 700, color: "#E0E0E0", letterSpacing: "-0.02em", lineHeight: 1.2, marginBottom: 6, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      {ipo.company}
-                    </div>
-                    {/* Ticker + date */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
-                      {ipo.symbol && (
-                        <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#5A5A5A" }}>{ipo.symbol}</span>
-                      )}
-                      <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, fontWeight: 600, color: i === 0 ? "#0D0D0D" : "#9A9A9A", background: i === 0 ? "#00FF41" : "#1A1A1A", borderRadius: 3, padding: "1px 6px" }}>
-                        {dateLabel}
-                      </span>
-                      {ipo.sector && (
-                        <span style={{ fontFamily: "var(--font-inter)", fontSize: 9, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.06em" }}>{ipo.sector}</span>
-                      )}
-                    </div>
-                    {/* Hype bar */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <div style={{ flex: 1, height: 2, background: "#1A1A1A", borderRadius: 1, overflow: "hidden" }}>
-                        <div style={{ height: "100%", width: `${Math.min(ipo.hypeScore, 100)}%`, background: i === 0 ? "#00FF41" : "#3A3A3A", borderRadius: 1 }} />
-                      </div>
-                      <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, fontWeight: 600, color: i === 0 ? "#00FF41" : "#4A4A4A", flexShrink: 0 }}>{ipo.hypeScore}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
           {/* Separator — visually bridges hero into tab bar */}
-          <div style={{ marginTop: "clamp(20px, 3vw, 28px)", height: 1, background: "linear-gradient(90deg, #1E1E1E 0%, #00FF4120 30%, #1E1E1E 100%)" }} />
+          <div style={{ marginTop: "clamp(16px, 2vw, 24px)", height: 1, background: "linear-gradient(90deg, #1E1E1E 0%, #00FF4120 30%, #1E1E1E 100%)" }} />
 
         </div>
       </section>
@@ -323,7 +275,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           .header-stats    { display: none !important; }
           .hero-layout     { flex-direction: column !important; gap: 24px !important; }
           .hero-spotlight  { width: 100% !important; max-width: 100% !important; }
-          .hero-top3       { flex-direction: column !important; }
         }
       `}</style>
     </div>
