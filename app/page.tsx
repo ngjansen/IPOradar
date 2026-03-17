@@ -105,17 +105,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   const allIPOs = [...upcoming, ...filed];
   const sectors = Array.from(new Set(allIPOs.map(ipo => ipo.sector).filter(Boolean))).sort();
-  const techCount = allIPOs.filter(ipo => ipo.isTech).length;
 
   const nextIPO = [...upcoming].sort((a, b) => a.date.localeCompare(b.date))[0] ?? null;
   const nextIPOLabel = nextIPO?.date
     ? new Date(nextIPO.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })
-    : "TBD";
-
-  // Top hype IPO (for spotlight card)
-  const topHypeIPO = [...upcoming].sort((a, b) => b.hypeScore - a.hypeScore)[0] ?? nextIPO;
-  const topHypeLabel = topHypeIPO?.date
-    ? new Date(topHypeIPO.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })
     : "TBD";
 
   return (
@@ -134,97 +127,34 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <div style={{ position: "relative", maxWidth: 1280, margin: "0 auto", padding: "clamp(24px, 3vw, 36px) clamp(16px, 4vw, 24px) clamp(12px, 2vw, 20px)" }}>
 
           {/* Brand row — replaces header */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-            <span style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 15, fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em" }}>
-              IPO<span style={{ color: "#00FF41" }}>radar</span>
-            </span>
-            <span style={{ color: "#3A3A3A", fontSize: 13 }}>•</span>
-            <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#00FF41", boxShadow: "0 0 6px #00FF41, 0 0 12px #00FF4160", animation: "blink 2s ease-in-out infinite" }} />
-          </div>
-
-          {/* Two-column: title+tagline LEFT, next-IPO spotlight RIGHT */}
-          <div className="hero-layout" style={{ display: "flex", alignItems: "flex-start", gap: 32, marginBottom: "clamp(24px, 4vw, 32px)" }}>
-
-            {/* LEFT */}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              {/* Pre-title */}
-              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", opacity: 0.6, letterSpacing: "0.15em", marginBottom: 12, animation: "fadeInUp 0.4s ease both", animationDelay: "0s" }}>
-                Real-time IPO intelligence
-              </div>
-              {/* H1 */}
-              <h1 style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(48px, 8vw, 88px)", fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em", lineHeight: 1, margin: 0, animation: "fadeInUp 0.4s ease both", animationDelay: "0.08s" }}>
-                IPO Radar
-                <span style={{ color: "#00FF41", textShadow: "0 0 12px #00FF4180", animation: "blink 1.2s step-end infinite" }}>_</span>
-              </h1>
-              {/* Tagline */}
-              <p style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(13px, 1.5vw, 16px)", color: "#6A6A6A", lineHeight: 1.6, maxWidth: 480, margin: "12px 0 0 0", animation: "fadeInUp 0.4s ease both", animationDelay: "0.16s" }}>
-                Never miss a market debut. Track every IPO from SEC filing to first trade — with hype scores, price ranges, and sector filters.
-              </p>
-            </div>
-
-            {/* RIGHT: top hype IPO spotlight card (only if upcoming IPOs exist) */}
-            {topHypeIPO && (
-              <div className="hero-spotlight" style={{ flexShrink: 0, width: "clamp(220px, 28vw, 300px)", background: "linear-gradient(135deg, #111111 0%, #141414 100%)", border: "1px solid #1E1E1E", borderTop: "1px solid #00FF4140", borderRadius: 12, padding: "16px 20px", position: "relative", overflow: "hidden", animation: "fadeInUp 0.4s ease both", animationDelay: "0.24s" }}>
-                {/* Card inner glow */}
-                <div style={{ position: "absolute", top: -20, left: -20, width: 120, height: 120, background: "radial-gradient(circle, #00FF4115 0%, transparent 70%)", pointerEvents: "none" }} />
-                {/* Label */}
-                <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#00FF41", opacity: 0.7, letterSpacing: "0.15em", marginBottom: 12 }}>// top pick</div>
-                {/* Company */}
-                <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(15px, 2vw, 18px)", fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.02em", lineHeight: 1.2, marginBottom: 8, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {topHypeIPO.company}
-                </div>
-                {/* Hype score */}
-                <div style={{ marginBottom: 10 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                    <span style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", letterSpacing: "0.08em", textTransform: "uppercase" }}>Hype Score</span>
-                    <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 13, fontWeight: 700, color: "#00FF41" }}>{topHypeIPO.hypeScore}</span>
-                  </div>
-                  <div style={{ height: 3, background: "#1A1A1A", borderRadius: 2, overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: `${Math.min(topHypeIPO.hypeScore, 100)}%`, background: "linear-gradient(90deg, #00FF41 0%, #00CC33 100%)", borderRadius: 2, boxShadow: "0 0 6px #00FF4160" }} />
-                  </div>
-                </div>
-                {/* Symbol + date pill */}
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
-                  {topHypeIPO.symbol && (
-                    <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#6A6A6A", fontWeight: 600 }}>{topHypeIPO.symbol}</span>
-                  )}
-                  <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, fontWeight: 600, color: "#0D0D0D", background: "#00FF41", borderRadius: 4, padding: "2px 7px", letterSpacing: "0.05em" }}>
-                    {topHypeLabel}
-                  </span>
-                </div>
-                {/* Sector + price range */}
-                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                  {topHypeIPO.sector && (
-                    <span style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", background: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: 4, padding: "2px 7px", letterSpacing: "0.05em", textTransform: "uppercase" }}>
-                      {topHypeIPO.sector}
-                    </span>
-                  )}
-                  {topHypeIPO.priceRange && topHypeIPO.priceRange !== "TBD" && topHypeIPO.priceRange !== "" && (
-                    <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#9A9A9A" }}>
-                      {topHypeIPO.priceRange}
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Live stats bar */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: "clamp(16px, 2vw, 24px)", animation: "fadeInUp 0.4s ease both", animationDelay: "0.32s" }}>
-            <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, fontWeight: 600, color: "#00FF41", background: "#00FF4118", border: "1px solid #00FF4130", borderRadius: 20, padding: "4px 12px" }}>
-              {upcoming.length} confirmed
-            </span>
-            <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, fontWeight: 600, color: "#6A6A6A", background: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: 20, padding: "4px 12px" }}>
-              {filed.length} filed
-            </span>
-            <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, fontWeight: 600, color: "#00FF41", background: "#00FF4110", border: "1px solid #00FF4120", borderRadius: 20, padding: "4px 12px" }}>
-              {techCount} tech
-            </span>
-            {nextIPO && (
-              <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, fontWeight: 700, color: "#0D0D0D", background: "#00FF41", borderRadius: 20, padding: "4px 12px" }}>
-                Next: {nextIPOLabel}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontFamily: "var(--font-space-grotesk)", fontSize: 15, fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em" }}>
+                IPO<span style={{ color: "#00FF41" }}>radar</span>
               </span>
-            )}
+              <span style={{ color: "#3A3A3A", fontSize: 13 }}>•</span>
+              <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#00FF41", boxShadow: "0 0 6px #00FF41, 0 0 12px #00FF4160", animation: "blink 2s ease-in-out infinite" }} />
+            </div>
+            <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A", letterSpacing: "0.02em" }}>
+              {upcoming.length} confirmed · {filed.length} filed · Next: {nextIPOLabel}
+            </span>
+          </div>
+
+          {/* Title + tagline */}
+          <div style={{ marginBottom: "clamp(24px, 4vw, 32px)" }}>
+            {/* Pre-title */}
+            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", opacity: 0.6, letterSpacing: "0.15em", marginBottom: 12, animation: "fadeInUp 0.4s ease both", animationDelay: "0s" }}>
+              Real-time IPO intelligence
+            </div>
+            {/* H1 */}
+            <h1 style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(48px, 8vw, 88px)", fontWeight: 700, color: "#F0F0F0", letterSpacing: "-0.04em", lineHeight: 1, margin: 0, animation: "fadeInUp 0.4s ease both", animationDelay: "0.08s" }}>
+              IPO Radar
+              <span style={{ color: "#00FF41", textShadow: "0 0 12px #00FF4180", animation: "blink 1.2s step-end infinite" }}>_</span>
+            </h1>
+            {/* Tagline */}
+            <p style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(13px, 1.5vw, 16px)", color: "#6A6A6A", lineHeight: 1.6, maxWidth: 600, margin: "12px 0 0 0", animation: "fadeInUp 0.4s ease both", animationDelay: "0.16s" }}>
+              Never miss a market debut. Track every IPO from SEC filing to first trade — with hype scores, price ranges, and sector filters.
+            </p>
           </div>
 
           {/* Separator — visually bridges hero into tab bar */}
@@ -266,10 +196,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       <style>{`
         @keyframes blink    { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 640px) {
-          .hero-layout     { flex-direction: column !important; gap: 24px !important; }
-          .hero-spotlight  { width: 100% !important; max-width: 100% !important; }
-        }
       `}</style>
     </div>
   );
