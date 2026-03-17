@@ -1,12 +1,12 @@
 import type { IPOStatus } from "@/lib/types";
 
 const BROKER_LINKS = {
-  robinhoodStock: (s: string) => `https://robinhood.com/stocks/${s}`,
+  robinhoodStock: (s: string) => `https://robinhood.com/us/en/stocks/${s}/`,
   webullStock: (s: string) =>
-    `https://www.webull.com/quote/nasdaq/${s.toLowerCase()}`,
+    `https://www.webull.com/quote/nasdaq-${s.toLowerCase()}`,
   robinhoodIPOAccess:
-    "https://robinhood.com/us/en/support/articles/ipo-investing/",
-  webullIPOCenter: "https://www.webull.com/ipo",
+    "https://robinhood.com/us/en/support/articles/ipo-access/",
+  webullIPOCenter: "https://www.webull.com/quote/us/ipo",
   ibkrAffiliate:
     "https://www.interactivebrokers.com/mkt/?src=ibkrwebu7&url=%2Fen%2Ftrading%2Fnew-issues-ipo.php",
   fidelityOpen: "https://www.fidelity.com/trading/ipos",

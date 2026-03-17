@@ -322,7 +322,7 @@ export function HomeTabsClient({
               Robinhood →
             </a>
             <a
-              href="https://www.webull.com/ipo"
+              href="https://www.webull.com/quote/us/ipo"
               target="_blank"
               rel="noopener noreferrer"
               style={{
