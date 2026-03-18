@@ -156,14 +156,23 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               Never miss a market debut. Track every IPO from SEC filing to first trade — with hype scores, price ranges, and sector filters.
             </p>
             {/* Source trust strip */}
-            <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 16, animation: "fadeInUp 0.4s ease both", animationDelay: "0.24s" }}>
-              <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#3A3A3A", letterSpacing: "0.08em", textTransform: "uppercase" }}>Sources</span>
-              <span style={{ color: "#1E1E1E", fontSize: 10 }}>—</span>
-              <a href="https://www.nasdaq.com/market-activity/ipos" target="_blank" rel="noopener noreferrer" className="src-link">Nasdaq EDGAR</a>
-              <a href="https://finnhub.io" target="_blank" rel="noopener noreferrer" className="src-link">Finnhub</a>
-              <a href="https://news.google.com" target="_blank" rel="noopener noreferrer" className="src-link">Google News</a>
-              <span style={{ color: "#1E1E1E", fontSize: 10 }}>·</span>
-              <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#3A3A3A", letterSpacing: "0.04em" }}>Updated hourly</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 20, animation: "fadeInUp 0.4s ease both", animationDelay: "0.24s", flexWrap: "wrap" }}>
+              <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#00FF41", opacity: 0.5, letterSpacing: "0.12em", textTransform: "uppercase", marginRight: 4 }}>Data from</span>
+              {[
+                { label: "Nasdaq EDGAR", href: "https://www.nasdaq.com/market-activity/ipos" },
+                { label: "Finnhub", href: "https://finnhub.io" },
+                { label: "Google News", href: "https://news.google.com" },
+              ].map((s, i) => (
+                <span key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  {i > 0 && <span style={{ color: "#2A2A2A", fontSize: 12 }}>·</span>}
+                  <a href={s.href} target="_blank" rel="noopener noreferrer" className="src-link">{s.label}</a>
+                </span>
+              ))}
+              <span style={{ color: "#2A2A2A", fontSize: 12, margin: "0 4px" }}>·</span>
+              <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#5A5A5A", letterSpacing: "0.04em", display: "flex", alignItems: "center", gap: 5 }}>
+                <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#00FF41", opacity: 0.7, display: "inline-block" }} />
+                Updated hourly
+              </span>
             </div>
           </div>
 
@@ -206,8 +215,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       <style>{`
         @keyframes blink    { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-        .src-link { font-family: var(--font-jetbrains-mono); font-size: 10px; color: #4A4A4A; text-decoration: none; letter-spacing: 0.04em; transition: color 0.15s ease; }
-        .src-link:hover { color: #8A8A8A; }
+        .src-link { font-family: var(--font-jetbrains-mono); font-size: 10px; color: #7A7A7A; text-decoration: none; letter-spacing: 0.04em; transition: color 0.15s ease; border-bottom: 1px solid #2A2A2A; padding-bottom: 1px; }
+        .src-link:hover { color: #C0C0C0; border-bottom-color: #5A5A5A; }
       `}</style>
     </div>
   );
