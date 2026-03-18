@@ -159,17 +159,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 16, animation: "fadeInUp 0.4s ease both", animationDelay: "0.24s" }}>
               <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#3A3A3A", letterSpacing: "0.08em", textTransform: "uppercase" }}>Sources</span>
               <span style={{ color: "#1E1E1E", fontSize: 10 }}>—</span>
-              {[
-                { label: "Nasdaq EDGAR", href: "https://www.nasdaq.com/market-activity/ipos" },
-                { label: "Finnhub", href: "https://finnhub.io" },
-                { label: "Google News", href: "https://news.google.com" },
-              ].map((s, i) => (
-                <a key={i} href={s.href} target="_blank" rel="noopener noreferrer"
-                  style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#4A4A4A", textDecoration: "none", letterSpacing: "0.04em", transition: "color 0.15s ease" }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#8A8A8A"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#4A4A4A"; }}
-                >{s.label}</a>
-              ))}
+              <a href="https://www.nasdaq.com/market-activity/ipos" target="_blank" rel="noopener noreferrer" className="src-link">Nasdaq EDGAR</a>
+              <a href="https://finnhub.io" target="_blank" rel="noopener noreferrer" className="src-link">Finnhub</a>
+              <a href="https://news.google.com" target="_blank" rel="noopener noreferrer" className="src-link">Google News</a>
               <span style={{ color: "#1E1E1E", fontSize: 10 }}>·</span>
               <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#3A3A3A", letterSpacing: "0.04em" }}>Updated hourly</span>
             </div>
@@ -214,6 +206,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       <style>{`
         @keyframes blink    { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .src-link { font-family: var(--font-jetbrains-mono); font-size: 10px; color: #4A4A4A; text-decoration: none; letter-spacing: 0.04em; transition: color 0.15s ease; }
+        .src-link:hover { color: #8A8A8A; }
       `}</style>
     </div>
   );
