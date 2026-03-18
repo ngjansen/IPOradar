@@ -220,74 +220,43 @@ export default async function IPODetailPage({
       >
         {/* Hero */}
         <div
+          className={`ipo-hero-card${ipo.isTech ? " ipo-hero-tech" : ""}`}
           style={{
             background: "#141414",
-            border: `1px solid ${ipo.isTech ? "#00FF4130" : "#222"}`,
+            border: `1px solid ${ipo.isTech ? "#00FF4130" : "#1E1E1E"}`,
             borderRadius: 16,
-            padding: "32px",
-            marginBottom: 32,
-            ...(ipo.isTech ? {
-              borderLeft: "3px solid #00FF41",
-              boxShadow: "-4px 0 20px #00FF4115",
-            } : {}),
+            padding: "28px 32px",
+            marginBottom: 28,
           }}
         >
-          <div style={{ display: "flex", alignItems: "flex-start", gap: 20, flexWrap: "wrap" }}>
-            <LetterAvatar name={ipo.company} size="lg" />
-
-            <div style={{ flex: 1, minWidth: 200 }}>
-              <div style={{ marginBottom: 6 }}>
-                <span
-                  style={{
-                    fontFamily: "var(--font-jetbrains-mono)",
-                    fontSize: 11,
-                    color: "#00FF41",
-                    background: "#00FF4110",
-                    border: "1px solid #00FF4130",
-                    borderRadius: 4,
-                    padding: "2px 8px",
-                    marginBottom: 8,
-                    display: "inline-block",
-                  }}
-                >
+          {/* Top: identity (left) + stats grid (right) */}
+          <div className="ipo-hero-body">
+            {/* Identity */}
+            <div className="ipo-identity">
+              <LetterAvatar name={ipo.company} size="lg" />
+              <div style={{ minWidth: 0 }}>
+                <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", background: "#00FF4110", border: "1px solid #00FF4130", borderRadius: 4, padding: "2px 8px", display: "inline-block", marginBottom: 8 }}>
                   ${ipo.symbol}
                 </span>
-              </div>
-              <h1
-                style={{
-                  fontFamily: "var(--font-space-grotesk)",
-                  fontSize: "clamp(22px, 4vw, 36px)",
-                  fontWeight: 700,
-                  color: "#F0F0F0",
-                  margin: "0 0 8px 0",
-                  letterSpacing: "-0.03em",
-                  lineHeight: 1.1,
-                }}
-              >
-                {ipo.company}
-              </h1>
-              <div
-                style={{
-                  fontFamily: "var(--font-inter)",
-                  fontSize: 13,
-                  color: "#6A6A6A",
-                }}
-              >
-                {ipo.sector} · {ipo.exchange}
-                {ipo.ceo && ` · CEO: ${ipo.ceo}`}
+                <h1 style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "clamp(20px, 3vw, 32px)", fontWeight: 700, color: "#F0F0F0", margin: "0 0 6px 0", letterSpacing: "-0.03em", lineHeight: 1.1 }}>
+                  {ipo.company}
+                </h1>
+                <div style={{ fontFamily: "var(--font-inter)", fontSize: 13, color: "#5A5A5A" }}>
+                  {ipo.sector}{ipo.exchange ? ` · ${ipo.exchange}` : ""}{ipo.ceo ? ` · CEO: ${ipo.ceo}` : ""}
+                </div>
               </div>
             </div>
 
-            {/* All IPO + Company stats — grid fills available space */}
+            {/* Stats grid */}
             {(() => {
               const ipoPrice = parseIPOPrice(ipo.priceRange);
               const stats: Array<{ label: string; value: string; accent?: boolean; href?: string }> = [
-                ipo.status === "upcoming" && ipo.date ? { label: "Expected Date", value: formatDate(ipo.date), accent: false } : null,
+                ipo.status === "upcoming" && ipo.date ? { label: "Expected Date", value: formatDate(ipo.date) } : null,
                 ipo.status === "filed" && ipo.filedDate ? { label: "Filed Date", value: formatDate(ipo.filedDate) } : null,
                 ipo.status === "priced" && ipo.pricedDate ? { label: "Priced Date", value: formatDate(ipo.pricedDate) } : null,
                 ipo.status === "priced" && quote ? { label: "Current Price", value: `$${quote.current.toFixed(2)}`, accent: true } : null,
-                ipo.status === "priced" && quote ? { label: "Day Change", value: `${formatSign(quote.change)} (${formatPct(quote.changePct)})`, accent: true } : null,
-                ipo.perfPct !== undefined ? { label: "Since IPO", value: formatPct(ipo.perfPct), accent: true } : null,
+                ipo.status === "priced" && quote ? { label: "Day Change", value: `${formatSign(quote.change)} (${formatPct(quote.changePct)})`, accent: quote.change >= 0 } : null,
+                ipo.perfPct !== undefined ? { label: "Since IPO", value: formatPct(ipo.perfPct), accent: ipo.perfPct >= 0 } : null,
                 ipo.priceRange ? { label: ipo.status === "priced" ? "Priced At" : "Price Range", value: ipo.priceRange, accent: ipo.status !== "priced" } : null,
                 ipoPrice && ipo.status === "priced" ? { label: "IPO Price", value: `$${ipoPrice.toFixed(2)}` } : null,
                 ipo.offerAmount ? { label: "Offer Size", value: ipo.offerAmount } : null,
@@ -305,19 +274,19 @@ export default async function IPODetailPage({
               ].filter(Boolean) as Array<{ label: string; value: string; accent?: boolean; href?: string }>;
 
               return (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: "14px 20px", flex: 1, minWidth: 0 }}>
+                <div className="ipo-stats-grid">
                   {stats.map((s, i) => (
                     <div key={i}>
-                      <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
+                      <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 5 }}>
                         {s.label}
                       </div>
                       {s.href ? (
                         <a href={s.href} target="_blank" rel="noopener noreferrer"
-                          style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: "#00FF41", textDecoration: "none", display: "block" }}>
+                          style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: "#00FF41", textDecoration: "none", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {s.value}
                         </a>
                       ) : (
-                        <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: s.accent ? "#00FF41" : "#C0C0C0", fontWeight: s.accent ? 600 : 400 }}>
+                        <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: s.accent ? "#00FF41" : "#C0C0C0", fontWeight: s.accent ? 600 : 400, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {s.value}
                         </div>
                       )}
@@ -328,67 +297,32 @@ export default async function IPODetailPage({
             })()}
           </div>
 
-          {/* CTA strip — inline in hero */}
-          <div style={{ borderTop: "1px solid #1E1E1E", marginTop: 24, paddingTop: 20, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          {/* CTA strip */}
+          <div className="ipo-cta-strip">
+            <div className="ipo-cta-btns">
               {ipo.status === "priced" ? (
                 <>
-                  <a href={`https://robinhood.com/us/en/stocks/${ipo.symbol}/`} target="_blank" rel="noopener noreferrer"
-                    style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 700, textDecoration: "none", borderRadius: 7, padding: "9px 18px", background: "#00FF41", color: "#0D0D0D", whiteSpace: "nowrap" as const }}>
-                    Trade on Robinhood →
-                  </a>
-                  <a href={`https://www.webull.com/quote/nasdaq-${ipo.symbol.toLowerCase()}`} target="_blank" rel="noopener noreferrer"
-                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
-                    Webull
-                  </a>
-                  <a href="https://www.fidelity.com/trading/ipos" target="_blank" rel="noopener noreferrer"
-                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
-                    Fidelity
-                  </a>
-                  <a href="https://www.interactivebrokers.com/mkt/?src=ibkrwebu7&url=%2Fen%2Ftrading%2Fnew-issues-ipo.php" target="_blank" rel="noopener noreferrer"
-                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
-                    IBKR
-                  </a>
+                  <a href={`https://robinhood.com/us/en/stocks/${ipo.symbol}/`} target="_blank" rel="noopener noreferrer" className="btn-primary">Trade on Robinhood →</a>
+                  <a href={`https://www.webull.com/quote/nasdaq-${ipo.symbol.toLowerCase()}`} target="_blank" rel="noopener noreferrer" className="btn-secondary">Webull</a>
+                  <a href="https://www.fidelity.com/trading/ipos" target="_blank" rel="noopener noreferrer" className="btn-secondary">Fidelity</a>
+                  <a href="https://www.interactivebrokers.com/mkt/?src=ibkrwebu7&url=%2Fen%2Ftrading%2Fnew-issues-ipo.php" target="_blank" rel="noopener noreferrer" className="btn-secondary">IBKR</a>
                 </>
               ) : ipo.status === "upcoming" ? (
                 <>
-                  <a href="https://robinhood.com/us/en/support/articles/ipo-access/" target="_blank" rel="noopener noreferrer"
-                    style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 700, textDecoration: "none", borderRadius: 7, padding: "9px 18px", background: "#00FF41", color: "#0D0D0D", whiteSpace: "nowrap" as const }}>
-                    Robinhood IPO Access →
-                  </a>
-                  <a href="https://www.webull.com/quote/us/ipo" target="_blank" rel="noopener noreferrer"
-                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
-                    Webull IPO Center
-                  </a>
-                  <a href="https://www.fidelity.com/trading/ipos" target="_blank" rel="noopener noreferrer"
-                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
-                    Fidelity
-                  </a>
+                  <a href="https://robinhood.com/us/en/support/articles/ipo-access/" target="_blank" rel="noopener noreferrer" className="btn-primary">Robinhood IPO Access →</a>
+                  <a href="https://www.webull.com/quote/us/ipo" target="_blank" rel="noopener noreferrer" className="btn-secondary">Webull IPO Center</a>
+                  <a href="https://www.fidelity.com/trading/ipos" target="_blank" rel="noopener noreferrer" className="btn-secondary">Fidelity</a>
                 </>
               ) : (
                 <>
-                  <a href="https://robinhood.com/us/en/support/articles/ipo-access/" target="_blank" rel="noopener noreferrer"
-                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
-                    Robinhood →
-                  </a>
-                  <a href="https://www.webull.com/quote/us/ipo" target="_blank" rel="noopener noreferrer"
-                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
-                    Webull →
-                  </a>
-                  <a href="https://www.fidelity.com/trading/ipos" target="_blank" rel="noopener noreferrer"
-                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
-                    Fidelity →
-                  </a>
-                  <a href="https://www.interactivebrokers.com/mkt/?src=ibkrwebu7&url=%2Fen%2Ftrading%2Fnew-issues-ipo.php" target="_blank" rel="noopener noreferrer"
-                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
-                    IBKR →
-                  </a>
+                  <a href="https://robinhood.com/us/en/support/articles/ipo-access/" target="_blank" rel="noopener noreferrer" className="btn-secondary">Robinhood →</a>
+                  <a href="https://www.webull.com/quote/us/ipo" target="_blank" rel="noopener noreferrer" className="btn-secondary">Webull →</a>
+                  <a href="https://www.fidelity.com/trading/ipos" target="_blank" rel="noopener noreferrer" className="btn-secondary">Fidelity →</a>
+                  <a href="https://www.interactivebrokers.com/mkt/?src=ibkrwebu7&url=%2Fen%2Ftrading%2Fnew-issues-ipo.php" target="_blank" rel="noopener noreferrer" className="btn-secondary">IBKR →</a>
                 </>
               )}
             </div>
-            <span style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#2A2A2A" }}>
-              Not financial advice.
-            </span>
+            <span style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#2A2A2A", flexShrink: 0 }}>Not financial advice.</span>
           </div>
         </div>
 
@@ -457,15 +391,8 @@ export default async function IPODetailPage({
           );
         })()}
 
-        {/* Two-column layout — news dominant left, details right */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "minmax(0, 1fr) minmax(0, 280px)",
-            gap: 24,
-            alignItems: "start",
-          }}
-        >
+        {/* Two-column layout — news dominant left, signup right */}
+        <div className="ipo-content-grid">
           {/* LEFT: News feed (dominant) */}
           <div>
             {/* About — compact, above news */}
@@ -485,6 +412,37 @@ export default async function IPODetailPage({
           </div>
         </div>
       </div>
+
+      <style>{`
+        /* Hero layout */
+        .ipo-hero-tech { border-left: 3px solid #00FF41 !important; box-shadow: -4px 0 20px #00FF4115; }
+        .ipo-hero-body { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: start; }
+        .ipo-identity  { display: flex; align-items: flex-start; gap: 16px; min-width: 0; }
+        .ipo-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 24px; }
+        .ipo-cta-strip { border-top: 1px solid #1E1E1E; margin-top: 24px; padding-top: 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .ipo-cta-btns  { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .btn-primary   { display: inline-flex; align-items: center; font-family: var(--font-inter); font-size: 13px; font-weight: 700; text-decoration: none; border-radius: 7px; padding: 9px 18px; background: #00FF41; color: #0D0D0D; white-space: nowrap; }
+        .btn-secondary { display: inline-flex; align-items: center; font-family: var(--font-inter); font-size: 12px; font-weight: 500; text-decoration: none; border-radius: 7px; padding: 9px 16px; background: transparent; color: #9A9A9A; border: 1px solid #2A2A2A; white-space: nowrap; }
+        .btn-primary:hover  { opacity: 0.88; }
+        .btn-secondary:hover { color: #E0E0E0; border-color: #4A4A4A; }
+
+        /* Content grid */
+        .ipo-content-grid { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; align-items: start; }
+
+        /* Tablet */
+        @media (max-width: 900px) {
+          .ipo-hero-body    { grid-template-columns: 1fr; }
+          .ipo-stats-grid   { grid-template-columns: repeat(3, 1fr); }
+          .ipo-content-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Mobile */
+        @media (max-width: 600px) {
+          .ipo-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 14px 16px; }
+          .ipo-cta-btns   { width: 100%; }
+          .btn-primary    { width: 100%; justify-content: center; }
+        }
+      `}</style>
     </div>
   );
 }
