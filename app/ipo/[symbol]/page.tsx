@@ -451,6 +451,69 @@ export default async function IPODetailPage({
               )}
             </div>
           </div>
+
+          {/* CTA strip — inline in hero */}
+          <div style={{ borderTop: "1px solid #1E1E1E", marginTop: 24, paddingTop: 20, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              {ipo.status === "priced" ? (
+                <>
+                  <a href={`https://robinhood.com/us/en/stocks/${ipo.symbol}/`} target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 700, textDecoration: "none", borderRadius: 7, padding: "9px 18px", background: "#00FF41", color: "#0D0D0D", whiteSpace: "nowrap" as const }}>
+                    Trade on Robinhood →
+                  </a>
+                  <a href={`https://www.webull.com/quote/nasdaq-${ipo.symbol.toLowerCase()}`} target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
+                    Webull
+                  </a>
+                  <a href="https://www.fidelity.com/trading/ipos" target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
+                    Fidelity
+                  </a>
+                  <a href="https://www.interactivebrokers.com/mkt/?src=ibkrwebu7&url=%2Fen%2Ftrading%2Fnew-issues-ipo.php" target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
+                    IBKR
+                  </a>
+                </>
+              ) : ipo.status === "upcoming" ? (
+                <>
+                  <a href="https://robinhood.com/us/en/support/articles/ipo-access/" target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 700, textDecoration: "none", borderRadius: 7, padding: "9px 18px", background: "#00FF41", color: "#0D0D0D", whiteSpace: "nowrap" as const }}>
+                    Robinhood IPO Access →
+                  </a>
+                  <a href="https://www.webull.com/quote/us/ipo" target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
+                    Webull IPO Center
+                  </a>
+                  <a href="https://www.fidelity.com/trading/ipos" target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
+                    Fidelity
+                  </a>
+                </>
+              ) : (
+                <>
+                  <a href="https://robinhood.com/us/en/support/articles/ipo-access/" target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
+                    Robinhood →
+                  </a>
+                  <a href="https://www.webull.com/quote/us/ipo" target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
+                    Webull →
+                  </a>
+                  <a href="https://www.fidelity.com/trading/ipos" target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
+                    Fidelity →
+                  </a>
+                  <a href="https://www.interactivebrokers.com/mkt/?src=ibkrwebu7&url=%2Fen%2Ftrading%2Fnew-issues-ipo.php" target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500, textDecoration: "none", borderRadius: 7, padding: "9px 16px", background: "transparent", color: "#9A9A9A", border: "1px solid #2A2A2A", whiteSpace: "nowrap" as const }}>
+                    IBKR →
+                  </a>
+                </>
+              )}
+            </div>
+            <span style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#2A2A2A" }}>
+              Not financial advice.
+            </span>
+          </div>
         </div>
 
         {/* Live Market Data card — priced + quote only */}
@@ -598,9 +661,6 @@ export default async function IPODetailPage({
                 ))}
               </div>
             </div>
-
-            {/* Broker CTA */}
-            <BrokerCTA symbol={ipo.symbol} status={ipo.status} company={ipo.company} />
 
             <IPOAlertSignup />
           </div>
