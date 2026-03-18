@@ -278,178 +278,54 @@ export default async function IPODetailPage({
               </div>
             </div>
 
-            {/* Key stats — conditional on status */}
-            <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
-              {ipo.status === "filed" ? (
-                <>
-                  <div>
-                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
-                      Status
-                    </div>
-                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 13, color: "#6A6A6A", fontWeight: 500 }}>
-                      Filed S-1 — Date TBD
-                    </div>
-                  </div>
-                  {ipo.filedDate && (
-                    <div>
+            {/* All IPO + Company stats — grid fills available space */}
+            {(() => {
+              const ipoPrice = parseIPOPrice(ipo.priceRange);
+              const stats: Array<{ label: string; value: string; accent?: boolean; href?: string }> = [
+                ipo.status === "upcoming" && ipo.date ? { label: "Expected Date", value: formatDate(ipo.date), accent: false } : null,
+                ipo.status === "filed" && ipo.filedDate ? { label: "Filed Date", value: formatDate(ipo.filedDate) } : null,
+                ipo.status === "priced" && ipo.pricedDate ? { label: "Priced Date", value: formatDate(ipo.pricedDate) } : null,
+                ipo.status === "priced" && quote ? { label: "Current Price", value: `$${quote.current.toFixed(2)}`, accent: true } : null,
+                ipo.status === "priced" && quote ? { label: "Day Change", value: `${formatSign(quote.change)} (${formatPct(quote.changePct)})`, accent: true } : null,
+                ipo.perfPct !== undefined ? { label: "Since IPO", value: formatPct(ipo.perfPct), accent: true } : null,
+                ipo.priceRange ? { label: ipo.status === "priced" ? "Priced At" : "Price Range", value: ipo.priceRange, accent: ipo.status !== "priced" } : null,
+                ipoPrice && ipo.status === "priced" ? { label: "IPO Price", value: `$${ipoPrice.toFixed(2)}` } : null,
+                ipo.offerAmount ? { label: "Offer Size", value: ipo.offerAmount } : null,
+                ipo.sharesOffered ? { label: "Shares Offered", value: (ipo.sharesOffered / 1e6).toFixed(1) + "M" } : null,
+                ipo.underwriter ? { label: "Underwriter", value: ipo.underwriter } : null,
+                ipo.exchange ? { label: "Exchange", value: ipo.exchange } : null,
+                ipo.sector ? { label: "Sector", value: ipo.sector } : null,
+                ipo.industry && ipo.industry !== ipo.sector ? { label: "Industry", value: ipo.industry } : null,
+                ipo.country ? { label: "Country", value: ipo.country } : null,
+                ipo.employees ? { label: "Employees", value: ipo.employees.toLocaleString() } : null,
+                ipo.revenue ? { label: "Revenue", value: formatRevenue(ipo.revenue) } : null,
+                ipo.hypeScore > 0 ? { label: "Hype Score", value: ipo.hypeScore.toFixed(1), accent: true } : null,
+                ipo.status === "filed" ? { label: "SEC Filing", value: "View S-1 ↗", href: `https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(ipo.symbol)}%22&dateRange=custom&startdt=2025-01-01&forms=S-1` } : null,
+                ipo.website ? { label: "Website", value: ipo.website.replace(/^https?:\/\//, ""), href: ipo.website } : null,
+              ].filter(Boolean) as Array<{ label: string; value: string; accent?: boolean; href?: string }>;
+
+              return (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: "14px 20px", flex: 1, minWidth: 0 }}>
+                  {stats.map((s, i) => (
+                    <div key={i}>
                       <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
-                        Filed Date
+                        {s.label}
                       </div>
-                      <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: "#9A9A9A", fontWeight: 500 }}>
-                        {formatDate(ipo.filedDate)}
-                      </div>
-                    </div>
-                  )}
-                  {ipo.offerAmount && (
-                    <div>
-                      <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
-                        Offer Size
-                      </div>
-                      <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: "#9A9A9A", fontWeight: 500 }}>
-                        {ipo.offerAmount}
-                      </div>
-                    </div>
-                  )}
-                  <div>
-                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
-                      SEC Filing
-                    </div>
-                    <a
-                      href={`https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(ipo.symbol)}%22&dateRange=custom&startdt=2025-01-01&forms=S-1`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 13, color: "#00FF41", textDecoration: "none" }}
-                    >
-                      View S-1 on EDGAR ↗
-                    </a>
-                  </div>
-                </>
-              ) : ipo.status === "priced" ? (
-                quote ? (
-                  // Priced with live quote: show price identity block
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "flex-end" }}>
-                    {/* Current price */}
-                    <div style={{ textAlign: "right" }}>
-                      <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
-                        Current Price
-                      </div>
-                      <div style={{
-                        fontFamily: "var(--font-jetbrains-mono)",
-                        fontSize: 32,
-                        fontWeight: 700,
-                        color: quote.change >= 0 ? "#00FF41" : "#FF4444",
-                        letterSpacing: "-0.02em",
-                        lineHeight: 1,
-                      }}>
-                        ${quote.current.toFixed(2)}
-                      </div>
-                    </div>
-                    {/* Day change */}
-                    <div style={{
-                      fontFamily: "var(--font-jetbrains-mono)",
-                      fontSize: 13,
-                      color: quote.change >= 0 ? "#00C932" : "#CC3333",
-                    }}>
-                      {formatSign(quote.change)} / {formatPct(quote.changePct)}
-                    </div>
-                    {/* Since IPO badge */}
-                    {ipo.perfPct !== undefined && (
-                      <div style={{
-                        fontFamily: "var(--font-jetbrains-mono)",
-                        fontSize: 12,
-                        background: ipo.perfPct >= 0 ? "#00FF4115" : "#FF444415",
-                        border: `1px solid ${ipo.perfPct >= 0 ? "#00FF4130" : "#FF444430"}`,
-                        color: ipo.perfPct >= 0 ? "#00FF41" : "#FF4444",
-                        borderRadius: 6,
-                        padding: "4px 10px",
-                        whiteSpace: "nowrap",
-                      }}>
-                        Since IPO: {ipo.priceRange} → ${quote.current.toFixed(2)} · {formatPct(ipo.perfPct)}
-                      </div>
-                    )}
-                    {ipo.offerAmount && (
-                      <div style={{ textAlign: "right" }}>
-                        <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 2 }}>
-                          Offer Size
+                      {s.href ? (
+                        <a href={s.href} target="_blank" rel="noopener noreferrer"
+                          style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: "#00FF41", textDecoration: "none", display: "block" }}>
+                          {s.value}
+                        </a>
+                      ) : (
+                        <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: s.accent ? "#00FF41" : "#C0C0C0", fontWeight: s.accent ? 600 : 400 }}>
+                          {s.value}
                         </div>
-                        <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 13, color: "#6A6A6A" }}>
-                          {ipo.offerAmount}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  // Priced without live quote: minimal fallback
-                  <>
-                    <div>
-                      <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
-                        Status
-                      </div>
-                      <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 13, color: "#6A6A6A", fontWeight: 500 }}>
-                        Priced ✓
-                      </div>
+                      )}
                     </div>
-                    {ipo.pricedDate && (
-                      <div>
-                        <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
-                          Priced Date
-                        </div>
-                        <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: "#9A9A9A", fontWeight: 500 }}>
-                          {formatDate(ipo.pricedDate)}
-                        </div>
-                      </div>
-                    )}
-                    <div>
-                      <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
-                        Priced At
-                      </div>
-                      <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: "#9A9A9A", fontWeight: 600 }}>
-                        {ipo.priceRange}
-                      </div>
-                    </div>
-                    {ipo.offerAmount && (
-                      <div>
-                        <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
-                          Offer Size
-                        </div>
-                        <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: "#9A9A9A", fontWeight: 500 }}>
-                          {ipo.offerAmount}
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )
-              ) : (
-                <>
-                  <div>
-                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
-                      Expected Date
-                    </div>
-                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: "#F0F0F0", fontWeight: 500 }}>
-                      {formatDate(ipo.date)}
-                    </div>
-                  </div>
-                  <div>
-                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
-                      Price Range
-                    </div>
-                    <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: "#00FF41", fontWeight: 600 }}>
-                      {ipo.priceRange}
-                    </div>
-                  </div>
-                  {ipo.hypeScore > 0 && (
-                    <div>
-                      <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>
-                        Hype Score
-                      </div>
-                      <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 14, color: "#00FF41", fontWeight: 600 }}>
-                        {ipo.hypeScore.toFixed(1)}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
 
           {/* CTA strip — inline in hero */}
@@ -585,7 +461,7 @@ export default async function IPODetailPage({
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "minmax(0, 1fr) minmax(0, 320px)",
+            gridTemplateColumns: "minmax(0, 1fr) minmax(0, 280px)",
             gap: 24,
             alignItems: "start",
           }}
@@ -603,65 +479,8 @@ export default async function IPODetailPage({
             <NewsFeed company={ipo.company} />
           </div>
 
-          {/* RIGHT: Details sidebar (sticky) */}
-          <div style={{ position: "sticky", top: 72, display: "flex", flexDirection: "column", gap: 16 }}>
-
-            {/* IPO Details card */}
-            <div style={{ background: "#141414", border: "1px solid #1E1E1E", borderRadius: 12, padding: "20px" }}>
-              <h3 style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, fontWeight: 700, color: "#4A4A4A", margin: "0 0 16px 0", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-                IPO Details
-              </h3>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {[
-                  ipo.pricedDate ? { label: "Priced Date", value: formatDate(ipo.pricedDate) } : null,
-                  ipo.filedDate ? { label: "Filed Date", value: formatDate(ipo.filedDate) } : null,
-                  ipo.date && ipo.status === "upcoming" ? { label: "Expected Date", value: formatDate(ipo.date) } : null,
-                  (() => {
-                    const p = parseIPOPrice(ipo.priceRange);
-                    return p ? { label: "IPO Price", value: `$${p.toFixed(2)}` } : (ipo.priceRange ? { label: "Price Range", value: ipo.priceRange } : null);
-                  })(),
-                  ipo.offerAmount ? { label: "Offer Size", value: ipo.offerAmount } : null,
-                  ipo.sharesOffered ? { label: "Shares Offered", value: (ipo.sharesOffered / 1e6).toFixed(1) + "M" } : null,
-                  ipo.underwriter ? { label: "Underwriter", value: ipo.underwriter } : null,
-                ].filter(Boolean).map((stat, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
-                    <span style={{ fontFamily: "var(--font-inter)", fontSize: 11, color: "#4A4A4A", flexShrink: 0 }}>{stat!.label}</span>
-                    <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: "#C0C0C0", textAlign: "right" }}>{stat!.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Company card */}
-            <div style={{ background: "#141414", border: "1px solid #1E1E1E", borderRadius: 12, padding: "20px" }}>
-              <h3 style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, fontWeight: 700, color: "#4A4A4A", margin: "0 0 16px 0", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-                Company
-              </h3>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {[
-                  { label: "Exchange", value: ipo.exchange, isLink: false },
-                  { label: "Sector", value: ipo.sector, isLink: false },
-                  { label: "Industry", value: ipo.industry, isLink: false },
-                  { label: "Country", value: ipo.country || "US", isLink: false },
-                  ipo.employees ? { label: "Employees", value: ipo.employees.toLocaleString(), isLink: false } : null,
-                  ipo.revenue ? { label: "Revenue", value: formatRevenue(ipo.revenue), isLink: false } : null,
-                  ipo.website ? { label: "Website", value: ipo.website, isLink: true } : null,
-                ].filter(Boolean).map((stat, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
-                    <span style={{ fontFamily: "var(--font-inter)", fontSize: 11, color: "#4A4A4A", flexShrink: 0 }}>{stat!.label}</span>
-                    {stat!.isLink ? (
-                      <a href={stat!.value} target="_blank" rel="noopener noreferrer"
-                        style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", textDecoration: "none", textAlign: "right" }}>
-                        {stat!.value.replace(/^https?:\/\//, "")}
-                      </a>
-                    ) : (
-                      <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: "#C0C0C0", textAlign: "right" }}>{stat!.value}</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
+          {/* RIGHT: email signup only (details are in the hero) */}
+          <div style={{ position: "sticky", top: 72 }}>
             <IPOAlertSignup />
           </div>
         </div>
