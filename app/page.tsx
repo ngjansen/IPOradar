@@ -135,7 +135,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               <span style={{ color: "#3A3A3A", fontSize: 13 }}>•</span>
               <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#00FF41", boxShadow: "0 0 6px #00FF41, 0 0 12px #00FF4160", animation: "blink 2s ease-in-out infinite" }} />
             </div>
-            <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#4A4A4A", letterSpacing: "0.02em" }}>
+            <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#8A8A8A", letterSpacing: "0.02em" }}>
               {upcoming.length} confirmed · {filed.length} filed · Next: {nextIPOLabel}
             </span>
           </div>
@@ -155,6 +155,24 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <p style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(13px, 1.5vw, 16px)", color: "#6A6A6A", lineHeight: 1.6, maxWidth: "none", margin: "12px 0 0 0", animation: "fadeInUp 0.4s ease both", animationDelay: "0.16s", whiteSpace: "nowrap" }}>
               Never miss a market debut. Track every IPO from SEC filing to first trade — with hype scores, price ranges, and sector filters.
             </p>
+            {/* Source trust strip */}
+            <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 16, animation: "fadeInUp 0.4s ease both", animationDelay: "0.24s" }}>
+              <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#3A3A3A", letterSpacing: "0.08em", textTransform: "uppercase" }}>Sources</span>
+              <span style={{ color: "#1E1E1E", fontSize: 10 }}>—</span>
+              {[
+                { label: "Nasdaq EDGAR", href: "https://www.nasdaq.com/market-activity/ipos" },
+                { label: "Finnhub", href: "https://finnhub.io" },
+                { label: "Google News", href: "https://news.google.com" },
+              ].map((s, i) => (
+                <a key={i} href={s.href} target="_blank" rel="noopener noreferrer"
+                  style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#4A4A4A", textDecoration: "none", letterSpacing: "0.04em", transition: "color 0.15s ease" }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#8A8A8A"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#4A4A4A"; }}
+                >{s.label}</a>
+              ))}
+              <span style={{ color: "#1E1E1E", fontSize: 10 }}>·</span>
+              <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: "#3A3A3A", letterSpacing: "0.04em" }}>Updated hourly</span>
+            </div>
           </div>
 
           {/* Separator — visually bridges hero into tab bar */}
