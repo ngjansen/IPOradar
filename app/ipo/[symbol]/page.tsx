@@ -44,9 +44,7 @@ async function getIPODetail(symbol: string): Promise<{ ipo: IPODetail; quote: St
 
     const ipo: IPODetail = {
       ...baseIPO,
-      description:
-        fmpData.description ||
-        `${baseIPO.company} is an upcoming initial public offering on ${baseIPO.exchange || "a major exchange"}.`,
+      description: fmpData.description || "",
       website: fmpData.website || finnhubData?.weburl || "",
       employees: fmpData.employees || finnhubData?.employeeTotal || null,
       revenue: fmpData.revenue || null,
