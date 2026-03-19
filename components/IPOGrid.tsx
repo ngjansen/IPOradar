@@ -1,15 +1,17 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, Suspense } from "react";
 import type { IPO } from "@/lib/types";
 import { IPOCard } from "./IPOCard";
 import { SearchBar } from "./SearchBar";
+import { SectorFilter } from "./SectorFilter";
 import { Tooltip } from "./Tooltip";
 
 interface IPOGridProps {
   upcoming: IPO[];
   filed: IPO[];
   activeSector: string;
+  sectors: string[];
 }
 
 function SectionHeading({ label, count, dim, tooltip }: { label: string; count: number; dim?: boolean; tooltip?: string }) {
@@ -57,7 +59,7 @@ function daysUntil(dateStr: string): number {
   return Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-export function IPOGrid({ upcoming, filed, activeSector }: IPOGridProps) {
+export function IPOGrid({ upcoming, filed, activeSector, sectors }: IPOGridProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const handleSearch = useCallback((q: string) => setSearchQuery(q), []);
 
@@ -83,9 +85,31 @@ export function IPOGrid({ upcoming, filed, activeSector }: IPOGridProps) {
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <SearchBar onSearch={handleSearch} />
-      </div>
+      {/* Confirmed upcoming — shown first, no filter needed */}
+      {filteredUpcoming.length > 0 && (
+        <div style={{ marginBottom: 48 }}>
+          <SectionHeading label="Confirmed — Date Set" count={filteredUpcoming.length} tooltip="These companies have set an official IPO date. Shares will begin trading on the expected date." />
+          {imminent.length > 0 && (
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#00FF41", boxShadow: "0 0 8px #00FF41, 0 0 16px #00FF4160" }} />
+              <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", textTransform: "uppercase", letterSpacing: "0.15em" }}>this week</span>
+            </div>
+          )}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(300px, 100%), 1fr))", gap: 16 }}>
+            {[...imminent, ...later].map(ipo => <IPOCard key={ipo.symbol} ipo={ipo} />)}
+          </div>
+        </div>
+      )}
+
+      {/* Filter bar — between upcoming and filed */}
+      {filed.length > 0 && (
+        <div style={{ borderTop: "1px solid #1A1A1A", borderBottom: "1px solid #1A1A1A", padding: "16px 0", marginBottom: 28, display: "flex", flexDirection: "column", gap: 12 }}>
+          <Suspense fallback={null}>
+            <SectorFilter sectors={sectors} />
+          </Suspense>
+          <SearchBar onSearch={handleSearch} />
+        </div>
+      )}
 
       {total === 0 ? (
         <div style={{ padding: "60px 0", textAlign: "center", fontFamily: "var(--font-inter)", fontSize: 14, color: "#4A4A4A" }}>
@@ -93,22 +117,6 @@ export function IPOGrid({ upcoming, filed, activeSector }: IPOGridProps) {
         </div>
       ) : (
         <>
-          {/* Confirmed upcoming */}
-          {filteredUpcoming.length > 0 && (
-            <div style={{ marginBottom: 48 }}>
-              <SectionHeading label="Confirmed — Date Set" count={filteredUpcoming.length} tooltip="These companies have set an official IPO date. Shares will begin trading on the expected date." />
-              {imminent.length > 0 && (
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#00FF41", boxShadow: "0 0 8px #00FF41, 0 0 16px #00FF4160" }} />
-                  <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: "#00FF41", textTransform: "uppercase", letterSpacing: "0.15em" }}>this week</span>
-                </div>
-              )}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(300px, 100%), 1fr))", gap: 16 }}>
-                {[...imminent, ...later].map(ipo => <IPOCard key={ipo.symbol} ipo={ipo} />)}
-              </div>
-            </div>
-          )}
-
           {/* Filed / pipeline */}
           {filteredFiled.length > 0 && (
             <div>

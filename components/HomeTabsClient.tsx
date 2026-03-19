@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import { SectorFilter } from "./SectorFilter";
+import { useState } from "react";
 import { IPOGrid } from "./IPOGrid";
 import { RecentIPOsClient } from "./RecentIPOsClient";
 import { SpeculationCard } from "./SpeculationCard";
@@ -131,28 +130,15 @@ export function HomeTabsClient({
 
       {/* Content panels */}
       {activeTab === "upcoming" && (
-        <div>
-          <div
-            style={{
-              maxWidth: 1280,
-              margin: "0 auto",
-              padding: "0 clamp(16px, 4vw, 24px) 16px",
-            }}
-          >
-            <Suspense fallback={null}>
-              <SectorFilter sectors={sectors} />
-            </Suspense>
-          </div>
-          <main
-            style={{
-              maxWidth: 1280,
-              margin: "0 auto",
-              padding: "0 clamp(16px, 4vw, 24px) 80px",
-            }}
-          >
-            <IPOGrid upcoming={upcoming} filed={filed} activeSector={activeSector} />
-          </main>
-        </div>
+        <main
+          style={{
+            maxWidth: 1280,
+            margin: "0 auto",
+            padding: "0 clamp(16px, 4vw, 24px) 80px",
+          }}
+        >
+          <IPOGrid upcoming={upcoming} filed={filed} activeSector={activeSector} sectors={sectors} />
+        </main>
       )}
 
       {activeTab === "recent" && (
