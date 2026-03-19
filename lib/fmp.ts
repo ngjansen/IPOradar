@@ -20,6 +20,7 @@ export async function fetchIPODetail(symbol: string): Promise<Partial<IPODetail>
   try {
     const res = await fetch(`${BASE}/profile/${symbol}?apikey=${key}`, {
       next: { revalidate: 14400 },
+      signal: AbortSignal.timeout(8000),
     });
 
     if (!res.ok) return {};

@@ -75,6 +75,7 @@ async function fetchMonth(yearMonth: string): Promise<{ upcoming: IPO[]; filed: 
   const res = await fetch(`${NASDAQ_API}?date=${yearMonth}`, {
     headers: HEADERS,
     next: { revalidate: 14400 },
+    signal: AbortSignal.timeout(8000),
   });
 
   if (!res.ok) throw new Error(`Nasdaq API error: ${res.status}`);
@@ -187,6 +188,7 @@ async function fetchMonthPriced(yearMonth: string): Promise<IPO[]> {
   const res = await fetch(`${NASDAQ_API}?date=${yearMonth}`, {
     headers: HEADERS,
     next: { revalidate: 14400 },
+    signal: AbortSignal.timeout(8000),
   });
 
   if (!res.ok) return [];

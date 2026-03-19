@@ -44,7 +44,7 @@ export async function fetchUpcomingIPOs(): Promise<IPO[]> {
   const to = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
 
   const url = `${BASE}/calendar/ipo?from=${today}&to=${to}&token=${key}`;
-  const res = await fetch(url, { next: { revalidate: 14400 } });
+  const res = await fetch(url, { next: { revalidate: 14400 }, signal: AbortSignal.timeout(8000) });
 
   if (!res.ok) {
     throw new Error(`Finnhub IPO calendar error: ${res.status}`);
@@ -109,6 +109,7 @@ export async function fetchStockQuote(symbol: string): Promise<StockQuote | null
 
     const res = await fetch(`${BASE}/quote?symbol=${symbol}&token=${key}`, {
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(8000),
     });
 
     if (!res.ok) return null;
@@ -132,6 +133,7 @@ export async function fetchCompanyProfile(symbol: string): Promise<FinnhubProfil
     const key = getKey();
     const res = await fetch(`${BASE}/stock/profile2?symbol=${symbol}&token=${key}`, {
       next: { revalidate: 14400 },
+      signal: AbortSignal.timeout(8000),
     });
 
     if (!res.ok) return null;

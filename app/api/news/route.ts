@@ -12,6 +12,9 @@ export async function GET(req: Request) {
   if (!company) {
     return NextResponse.json({ error: "Missing ?company= parameter" }, { status: 400 });
   }
+  if (company.length > 100) {
+    return NextResponse.json({ error: "Invalid" }, { status: 400 });
+  }
 
   try {
     const articles = await fetchNewsForCompany(company);

@@ -267,7 +267,7 @@ export default async function IPODetailPage({
                 ipo.employees ? { label: "Employees", value: ipo.employees.toLocaleString() } : null,
                 ipo.revenue ? { label: "Revenue", value: formatRevenue(ipo.revenue) } : null,
                 ipo.hypeScore > 0 ? { label: "Hype Score", value: ipo.hypeScore.toFixed(1), accent: true } : null,
-                ipo.status === "filed" ? { label: "SEC Filing", value: "View S-1 ↗", href: `https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(ipo.symbol)}%22&dateRange=custom&startdt=2025-01-01&forms=S-1` } : null,
+                ipo.status === "filed" ? { label: "SEC Filing", value: "View S-1 ↗", href: `https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(ipo.symbol)}%22&dateRange=custom&startdt=${new Date().getFullYear() - 1}-01-01&forms=S-1` } : null,
                 ipo.website ? { label: "Website", value: ipo.website.replace(/^https?:\/\//, ""), href: ipo.website } : null,
               ].filter(Boolean) as Array<{ label: string; value: string; accent?: boolean; href?: string }>;
 
@@ -303,7 +303,7 @@ export default async function IPODetailPage({
                   <a href={`https://robinhood.com/us/en/stocks/${ipo.symbol}/`} target="_blank" rel="noopener noreferrer" className="btn-primary">Trade on Robinhood →</a>
                   <a href={`https://www.webull.com/quote/nasdaq-${ipo.symbol.toLowerCase()}`} target="_blank" rel="noopener noreferrer" className="btn-secondary">Webull</a>
                   <a href="https://www.fidelity.com/trading/ipos" target="_blank" rel="noopener noreferrer" className="btn-secondary">Fidelity</a>
-                  <a href="https://www.interactivebrokers.com/mkt/?src=ibkrwebu7&url=%2Fen%2Ftrading%2Fnew-issues-ipo.php" target="_blank" rel="noopener noreferrer" className="btn-secondary">IBKR</a>
+                  <a href="https://www.interactivebrokers.com/mkt/?src=ibkrwebu7&url=%2Fen%2Ftrading%2Fnew-issues-ipo.php" target="_blank" rel="noopener noreferrer" className="btn-secondary">IBKR†</a>
                 </>
               ) : ipo.status === "upcoming" ? (
                 <>
@@ -316,11 +316,11 @@ export default async function IPODetailPage({
                   <a href="https://robinhood.com/us/en/support/articles/ipo-access/" target="_blank" rel="noopener noreferrer" className="btn-secondary">Robinhood →</a>
                   <a href="https://www.webull.com/quote/us/ipo" target="_blank" rel="noopener noreferrer" className="btn-secondary">Webull →</a>
                   <a href="https://www.fidelity.com/trading/ipos" target="_blank" rel="noopener noreferrer" className="btn-secondary">Fidelity →</a>
-                  <a href="https://www.interactivebrokers.com/mkt/?src=ibkrwebu7&url=%2Fen%2Ftrading%2Fnew-issues-ipo.php" target="_blank" rel="noopener noreferrer" className="btn-secondary">IBKR →</a>
+                  <a href="https://www.interactivebrokers.com/mkt/?src=ibkrwebu7&url=%2Fen%2Ftrading%2Fnew-issues-ipo.php" target="_blank" rel="noopener noreferrer" className="btn-secondary">IBKR† →</a>
                 </>
               )}
             </div>
-            <span style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#2A2A2A", flexShrink: 0 }}>Not financial advice.</span>
+            <span style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#2A2A2A", flexShrink: 0 }}>Not financial advice. † affiliate link</span>
           </div>
         </div>
 
@@ -352,14 +352,13 @@ export default async function IPODetailPage({
           ];
           return (
             <div
+              className="market-tiles"
               style={{
                 background: "#141414",
                 border: "1px solid #222",
                 borderRadius: 12,
                 padding: "20px 24px",
                 marginBottom: 32,
-                display: "grid",
-                gridTemplateColumns: "repeat(4, 1fr)",
                 gap: 0,
               }}
             >
@@ -433,6 +432,10 @@ export default async function IPODetailPage({
           .ipo-stats-grid   { grid-template-columns: repeat(3, 1fr); }
           .ipo-content-grid { grid-template-columns: 1fr; }
         }
+
+        /* Market tiles */
+        .market-tiles { display: grid; grid-template-columns: repeat(4, 1fr); }
+        @media (max-width: 600px) { .market-tiles { grid-template-columns: repeat(2, 1fr); } }
 
         /* Mobile */
         @media (max-width: 600px) {

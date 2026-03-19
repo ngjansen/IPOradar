@@ -126,7 +126,7 @@ export function BrokerCTA({ symbol, status, company }: BrokerCTAProps) {
               rel="noopener noreferrer"
               style={secondaryBtn}
             >
-              IBKR
+              IBKR†
             </a>
           </div>
         </div>
@@ -138,7 +138,7 @@ export function BrokerCTA({ symbol, status, company }: BrokerCTAProps) {
             marginTop: 10,
           }}
         >
-          Not financial advice. Do your own research before investing.
+          Not financial advice. Do your own research before investing. † affiliate link
         </div>
       </div>
     );
@@ -276,7 +276,7 @@ export function BrokerCTA({ symbol, status, company }: BrokerCTAProps) {
             rel="noopener noreferrer"
             style={secondaryBtn}
           >
-            IBKR →
+            IBKR† →
           </a>
         </div>
       </div>
@@ -288,7 +288,7 @@ export function BrokerCTA({ symbol, status, company }: BrokerCTAProps) {
           marginTop: 10,
         }}
       >
-        Not financial advice. Do your own research before investing.
+        Not financial advice. Do your own research before investing. † affiliate link
       </div>
     </div>
   );

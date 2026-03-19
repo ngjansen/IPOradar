@@ -103,6 +103,7 @@ function RecentIPORow({ ipo }: { ipo: IPO }) {
       style={{
         display: "grid",
         gridTemplateColumns: "36px 1fr 90px 80px 80px 80px",
+        minWidth: 560,
         alignItems: "center",
         padding: "10px 16px",
         gap: 8,
@@ -450,6 +451,7 @@ export function RecentIPOsClient({ ipos }: RecentIPOsClientProps) {
             border: "1px solid #1E1E1E",
             borderRadius: 12,
             overflow: "hidden",
+            overflowX: "auto",
           }}
         >
           {/* Header row */}
@@ -457,6 +459,7 @@ export function RecentIPOsClient({ ipos }: RecentIPOsClientProps) {
             style={{
               display: "grid",
               gridTemplateColumns: "36px 1fr 90px 80px 80px 80px",
+              minWidth: 560,
               padding: "8px 16px",
               gap: 8,
               borderBottom: "1px solid #222",

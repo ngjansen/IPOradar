@@ -243,7 +243,7 @@ export function SpeculationCard({ company, news }: SpeculationCardProps) {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "24px",
+            padding: "clamp(12px, 4vw, 24px)",
           }}
           onClick={() => setOpen(false)}
         >

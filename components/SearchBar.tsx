@@ -42,6 +42,8 @@ export function SearchBar({ onSearch, placeholder = "Search company or ticker…
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
+        inputMode="search"
+        autoComplete="off"
         style={{
           width: "100%",
           background: "#141414",

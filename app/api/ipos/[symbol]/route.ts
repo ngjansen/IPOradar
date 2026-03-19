@@ -11,6 +11,9 @@ export async function GET(
   { params }: { params: Promise<{ symbol: string }> }
 ) {
   const { symbol } = await params;
+  if (!/^[A-Z0-9.]{1,6}$/i.test(symbol)) {
+    return NextResponse.json({ error: "Invalid symbol" }, { status: 400 });
+  }
   const upper = symbol.toUpperCase();
 
   try {
