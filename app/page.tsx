@@ -152,7 +152,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               <span style={{ color: "#00FF41", textShadow: "0 0 12px #00FF4180", animation: "blink 1.2s step-end infinite" }}>_</span>
             </h1>
             {/* Tagline */}
-            <p style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(13px, 1.5vw, 16px)", color: "#6A6A6A", lineHeight: 1.6, maxWidth: 600, margin: "12px 0 0 0", animation: "fadeInUp 0.4s ease both", animationDelay: "0.16s" }}>
+            <p style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(13px, 1.5vw, 16px)", color: "#6A6A6A", lineHeight: 1.6, maxWidth: "none", margin: "12px 0 0 0", animation: "fadeInUp 0.4s ease both", animationDelay: "0.16s", whiteSpace: "nowrap" }}>
               Never miss a market debut. Track every IPO from SEC filing to first trade — with hype scores, price ranges, and sector filters.
             </p>
             {/* Source trust strip */}
