@@ -38,3 +38,17 @@ export interface NewsItem {
   publishedAt: string;    // ISO date string
   snippet: string;
 }
+
+export type AnalysisVerdict = "BUY_NOW" | "WAIT" | "PASS" | "HIGH_RISK";
+export type AnalysisConfidence = "LOW" | "MEDIUM" | "HIGH";
+
+export interface IPOAnalysis {
+  verdict: AnalysisVerdict;
+  verdictLabel: string;        // e.g. "Strong Buy", "High Volatility Risk"
+  confidence: AnalysisConfidence;
+  summary: string;             // 2–3 sentences
+  bullCase: string[];          // 2–3 items
+  bearCase: string[];          // 2–3 items
+  keyRisks: string[];          // 2–3 items
+  timeHorizon: string;         // e.g. "Short-term (1–3 months)"
+}

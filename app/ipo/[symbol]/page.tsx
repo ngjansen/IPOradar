@@ -10,10 +10,14 @@ import { fetchUpcomingIPOs, fetchCompanyProfile, fetchStockQuote } from "@/lib/f
 import type { StockQuote } from "@/lib/finnhub";
 import { fetchNasdaqIPOs, fetchRecentIPOs } from "@/lib/nasdaq";
 import { fetchIPODetail } from "@/lib/fmp";
+import { fetchNewsForCompany } from "@/lib/news";
+import { generateIPOAnalysis } from "@/lib/analysis";
+import type { IPOAnalysis } from "@/lib/types";
+import { IPOAnalysisCard } from "@/components/IPOAnalysisCard";
 
 export const revalidate = 14400;
 
-async function getIPODetail(symbol: string): Promise<{ ipo: IPODetail; quote: StockQuote | null } | null> {
+async function getIPODetail(symbol: string): Promise<{ ipo: IPODetail; quote: StockQuote | null; analysis: IPOAnalysis | null } | null> {
   try {
     const upper = symbol.toUpperCase();
 
@@ -60,7 +64,10 @@ async function getIPODetail(symbol: string): Promise<{ ipo: IPODetail; quote: St
         : undefined,
     };
 
-    return { ipo, quote };
+    const news = await fetchNewsForCompany(ipo.company).catch(() => []);
+    const analysis = await generateIPOAnalysis(ipo, news).catch(() => null);
+
+    return { ipo, quote, analysis };
   } catch {
     return null;
   }
@@ -165,7 +172,7 @@ export default async function IPODetailPage({
     notFound();
   }
 
-  const { ipo, quote } = result;
+  const { ipo, quote, analysis } = result;
 
   return (
     <div style={{ minHeight: "100vh", background: "#0D0D0D" }}>
@@ -323,6 +330,9 @@ export default async function IPODetailPage({
             <span style={{ fontFamily: "var(--font-inter)", fontSize: 10, color: "#2A2A2A", flexShrink: 0 }}>Not financial advice. † affiliate link</span>
           </div>
         </div>
+
+        {/* AI Analysis — between hero and market tiles */}
+        {analysis && <IPOAnalysisCard analysis={analysis} />}
 
         {/* Live Market Data card — priced + quote only */}
         {ipo.status === "priced" && quote && (() => {
