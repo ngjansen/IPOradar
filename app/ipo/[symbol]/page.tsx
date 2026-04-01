@@ -115,20 +115,26 @@ export async function generateMetadata({
   const { ipo } = result;
 
   if (ipo.status === "filed") {
+    const desc = `${ipo.company} (${ipo.symbol}) has filed an S-1 with the SEC. IPO date is pending. ${ipo.description?.slice(0, 100) || ""}`;
     return {
       title: `${ipo.company} IPO — Filed S-1, Date TBD`,
-      description: `${ipo.company} (${ipo.symbol}) has filed an S-1 with the SEC. IPO date is pending. ${ipo.description?.slice(0, 100) || ""}`,
+      description: desc,
+      twitter: { card: "summary_large_image", title: `${ipo.company} IPO — Filed S-1`, description: desc },
     };
   }
   if (ipo.status === "priced") {
+    const desc = `${ipo.company} (${ipo.symbol}) priced its IPO on ${ipo.pricedDate} at ${ipo.priceRange}. ${ipo.description?.slice(0, 100) || ""}`;
     return {
       title: `${ipo.company} IPO — Priced at ${ipo.priceRange}`,
-      description: `${ipo.company} (${ipo.symbol}) priced its IPO on ${ipo.pricedDate} at ${ipo.priceRange}. ${ipo.description?.slice(0, 100) || ""}`,
+      description: desc,
+      twitter: { card: "summary_large_image", title: `${ipo.company} IPO — Priced at ${ipo.priceRange}`, description: desc },
     };
   }
+  const desc = `${ipo.company} (${ipo.symbol}) IPO on ${ipo.exchange}. Expected date: ${ipo.date}. Price range: ${ipo.priceRange}. ${ipo.description?.slice(0, 100) || ""}`;
   return {
     title: `${ipo.company} IPO — ${ipo.date}, ${ipo.priceRange} & Latest News`,
-    description: `${ipo.company} (${ipo.symbol}) IPO on ${ipo.exchange}. Expected date: ${ipo.date}. Price range: ${ipo.priceRange}. ${ipo.description?.slice(0, 100) || ""}`,
+    description: desc,
+    twitter: { card: "summary_large_image", title: `${ipo.company} IPO — ${ipo.date}`, description: desc },
   };
 }
 
@@ -174,8 +180,35 @@ export default async function IPODetailPage({
 
   const { ipo, quote, analysis } = result;
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": ipo.status === "priced" ? "Event" : "Event",
+    "name": `${ipo.company} IPO`,
+    ...(ipo.date || ipo.pricedDate ? { "startDate": ipo.pricedDate || ipo.date } : {}),
+    "location": {
+      "@type": "VirtualLocation",
+      "name": ipo.exchange || "US Stock Exchange",
+    },
+    "organizer": {
+      "@type": "Organization",
+      "name": ipo.company,
+      ...(ipo.website ? { "url": ipo.website } : {}),
+    },
+    ...(ipo.description ? { "description": ipo.description } : {}),
+    "eventStatus": ipo.status === "priced"
+      ? "https://schema.org/EventScheduled"
+      : ipo.status === "upcoming"
+      ? "https://schema.org/EventScheduled"
+      : "https://schema.org/EventPostponed",
+    "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+  };
+
   return (
     <div style={{ minHeight: "100vh", background: "#0D0D0D" }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Nav */}
       <nav
         style={{

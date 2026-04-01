@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono, Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -21,6 +22,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "https://iporadar.vercel.app"
+  ),
   title: {
     default: `Upcoming IPO Calendar ${new Date().getFullYear()} — IPOradar`,
     template: "%s — IPOradar",
@@ -31,6 +35,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "IPOradar",
+    images: [{ url: "/opengraph-image.png", width: 1200, height: 630, alt: "IPOradar — Upcoming IPO Calendar" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Upcoming IPO Calendar ${new Date().getFullYear()} — IPOradar`,
+    description:
+      "Discover upcoming IPOs, track hype scores, and read live news. The terminal-style IPO calendar for retail investors.",
+    images: ["/opengraph-image.png"],
   },
 };
 
@@ -43,6 +55,7 @@ export default function RootLayout({
     <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${inter.variable}`}>
       <body className="antialiased">
         {children}
+        <Analytics />
       </body>
     </html>
   );

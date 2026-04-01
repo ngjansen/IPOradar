@@ -52,9 +52,9 @@ export const SPECULATIVE_IPOS: SpeculativeCompany[] = [
   {
     name: "OpenAI",
     sector: "AI",
-    valuation: "~$157B",
-    timeline: "No Concrete Plans",
-    description: "Creator of ChatGPT and GPT-4; exploring for-profit restructuring.",
+    valuation: "~$300B",
+    timeline: "No Concrete Plans (restructuring ongoing)",
+    description: "Creator of ChatGPT and GPT-4; completed for-profit restructuring in 2025.",
   },
   {
     name: "Anthropic",
